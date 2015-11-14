@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1">
+        <file>
+            <url>src/cz/muni/fi/xlabuda/AutomaticDescriptorsChooser.java</url>
+            <line>62</line>
+        </file>
+        <file>
+            <url>src/cz/muni/fi/xlabuda/DescriptorsFileChooser.java</url>
+            <line>62</line>
+        </file>
+    </editor-bookmarks>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0">
+        <file>
+            <url>src/cz/muni/fi/xlabuda/DescriptorsFileChooser.java</url>
+            <bookmark id="0">
+                <name/>
+                <line>62</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>src/cz/muni/fi/xlabuda/AutomaticDescriptorsChooser.java</url>
+            <bookmark id="0">
+                <name/>
+                <line>62</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group name="Research"/>
+        <group>
+            <file>file:/C:/Users/Tomas/Documents/BPv2/implementation/LocalDescriptorsVisualization/src/cz/muni/fi/xlabuda/Projection.java</file>
+            <file>file:/C:/Users/Tomas/Documents/BPv2/implementation/LocalDescriptorsVisualization/src/cz/muni/fi/xlabuda/NeedlemanWunsch.java</file>
+            <file>file:/C:/Users/Tomas/Documents/BPv2/implementation/LocalDescriptorsVisualization/src/cz/muni/fi/xlabuda/MainFrame.java</file>
+            <file>file:/C:/Users/Tomas/Documents/BPv2/implementation/LocalDescriptorsVisualization/src/cz/muni/fi/xlabuda/SmithWaterman.java</file>
+            <file>file:/C:/Users/Tomas/Documents/BPv2/implementation/LocalDescriptorsVisualization/src/cz/muni/fi/xlabuda/ProjectionGlassPane.java</file>
+            <file>file:/C:/Users/Tomas/Documents/BPv2/implementation/LocalDescriptorsVisualization/src/cz/muni/fi/xlabuda/ImageScrollPane.java</file>
+            <file>file:/C:/Users/Tomas/Documents/BPv2/implementation/LocalDescriptorsVisualization/src/cz/muni/fi/xlabuda/ProjectionPanel.java</file>
+        </group>
+    </open-files>
+</project-private>
