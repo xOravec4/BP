@@ -7,6 +7,7 @@ package cz.muni.fi.xlabuda;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import messif.objects.impl.ObjectFeature;
 import static messif.objects.impl.ObjectFeatureSetSmithWaterman.max4;
@@ -33,6 +34,9 @@ public class SmithWaterman {
         int n = list1.size();       // length of this "string"
         int m = list2.size();       // length of o."string"
 
+        int topIndex = n;
+        int sideIndex = m;
+        
         if (m == 0 || n == 0){
             similarity = 0;
             return;
@@ -53,11 +57,16 @@ public class SmithWaterman {
             H[0][j] = 0.0f;
             F[0][j] = Float.NEGATIVE_INFINITY;//0.0f;
         }
+        
+        Iterator <ObjectFeature>it1 = list1.iterator();
+        Iterator <ObjectFeature>it2 = list2.iterator();
 
-        for (int i = 1; i <= m; i++) {
-            ObjectFeature o2 = list2.get(i);
-            for (int j = 1; j <= n; j++) {
-                ObjectFeature o1 = list1.get(i);
+        for (int i = 1; i < m; i++) {
+            System.out.println("prvy " + i + " / " + m);
+            ObjectFeature o2 = it2.next();
+            for (int j = 1; j < n; j++) {
+                System.out.println("druhy " + j + " / " + n);
+                ObjectFeature o1 = it1.next();
                 E[i][j] = Math.max(E[i][j-1] - cost.getGapContinue(), H[i][j-1] - cost.getGapOpening());
                 F[i][j] = Math.max(F[i-1][j] - cost.getGapContinue(), H[i-1][j] - cost.getGapOpening());
                 
@@ -71,15 +80,18 @@ public class SmithWaterman {
                 if (H[i][j] > max) {
                     // i and j holds now the end of the sequence
                     max = H[i][j];
+                    sideIndex = i;
+                    topIndex = j;
                 }
             }
+            it1 = list1.iterator();
            
             
         }
-         similarity = max;
+        similarity = max;
         
-        int topIndex = n;
-        int sideIndex = m;
+        
+
         boolean horizontally = false;
         boolean vertically = false;
         result1.add(list1.get(topIndex-1));

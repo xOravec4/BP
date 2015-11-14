@@ -32,7 +32,6 @@ public class Projection  {
     private ProjectionTo projectionTo;
     //private Map<ObjectFeature, Float> result;
     
-    
     public Projection(ProjectionTo projectionTo)
     {
        this.projectionTo = projectionTo;

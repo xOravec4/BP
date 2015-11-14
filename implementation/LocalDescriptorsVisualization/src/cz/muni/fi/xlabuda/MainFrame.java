@@ -123,7 +123,8 @@ public class MainFrame extends JFrame {
     private JMenuItem projectionTogglePositionFirstImage;
     private JMenuItem projectionTogglePositionSecondImage;
     
-    private JMenuItem mojTest;
+    private JMenuItem needlemanWunschButton;
+    private JMenuItem smithWatermanButton;
     
     private JMenuItem projectionMenuSuitable;
     private JMenuItem projectionMenuCustom;
@@ -276,8 +277,8 @@ public class MainFrame extends JFrame {
         projectionTogglePositionFirstImage = new JMenuItem();
         projectionTogglePositionSecondImage = new JMenuItem();
         
-        mojTest = new JMenuItem();
-                
+        needlemanWunschButton = new JMenuItem();
+        smithWatermanButton = new JMenuItem();
         
         projectionMenuSuitable = new JMenuItem();
         projectionMenuCustom = new JMenuItem();
@@ -680,25 +681,47 @@ public class MainFrame extends JFrame {
         projectionFirstImage.setText("First Image");
         projectionSecondImage.setText("Second Image");
         
-        mojTest.setText("Test");
-        mojTest.addActionListener(new java.awt.event.ActionListener() {
+         smithWatermanButton.setText("SmithWaterman");
+         smithWatermanButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-              
-          // ObjectFeatureSet first = imageScrollPane.getImagePanel().getDescriptors().getDescriptors();
            
            Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
            Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
            
            Projection proj = new Projection(ProjectionTo.X);
-           //Map<ObjectFeature, Float> a = proj.getProjection(first);
+
+           SmithWaterman smithWaterman = new SmithWaterman( proj.getSortedProjection(first),  proj.getSortedProjection(second));         
+            
+           projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
+                setGlassPane(projectionGlassPane);
+                projectionGlassPane.setEnabled(true);
+                projectionGlassPane.setVisible(true);
+                
+           imageScrollPane.getBottomProjectionPanel().setData(smithWaterman.getFirstSequence());
+           imageScrollPane.getSideProjectionPanel().setData(smithWaterman.getFirstSequence());
+           secondImageScrollPane.getBottomProjectionPanel().setData(smithWaterman.getSecondSequence());
+           secondImageScrollPane.getSideProjectionPanel().setData(smithWaterman.getSecondSequence());
            
-            //ResetableIterator<ObjectFeature> it1 = (ResetableIterator) asd.iterator();
-           // ResetableIterator<ObjectFeature> it2 = (ResetableIterator) asd.iterator();
+           imageScrollPane.SetBottomProjectionPanelVisible();
+           secondImageScrollPane.SetBottomProjectionPanelVisible();
+           imageScrollPane.SetSideProjectionPanelInvisible();
+           secondImageScrollPane.SetSideProjectionPanelInvisible();
+           revalidate();
+            }
+        
+        
+        });
+        
+        needlemanWunschButton.setText("NeedlemanWunsch");
+        needlemanWunschButton.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent event) {
            
-           //List <ObjectFeature> testASd = proj.getSortedProjection(first);
-           NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( proj.getSortedProjection(first),  proj.getSortedProjection(second));
-           //NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( testASd,testASd);
+           Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+           Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
            
+           Projection proj = new Projection(ProjectionTo.X);
+
+           NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( proj.getSortedProjection(first),  proj.getSortedProjection(second));         
             
            projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
                 setGlassPane(projectionGlassPane);
@@ -712,6 +735,8 @@ public class MainFrame extends JFrame {
            
            imageScrollPane.SetBottomProjectionPanelVisible();
            secondImageScrollPane.SetBottomProjectionPanelVisible();
+           imageScrollPane.SetSideProjectionPanelInvisible();
+           secondImageScrollPane.SetSideProjectionPanelInvisible();
            revalidate();
             }
         
@@ -1056,7 +1081,9 @@ public class MainFrame extends JFrame {
         projectionSecondImage.add(new JSeparator());
         projectionSecondImage.add(projectionTogglePositionSecondImage);
        
-        projectionMenu.add(mojTest);
+        projectionMenu.add(needlemanWunschButton);
+        
+        projectionMenu.add(smithWatermanButton);
         /*
         projectionMenu.add(projectionMenuY);
         projectionMenu.add(projectionMenuSuitable);
