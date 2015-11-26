@@ -65,6 +65,7 @@ public class AutomaticDescriptorsSelector {
                                 Utils.setDirectoryProperty(file.getParentFile(), "directory");
 
                                 mainFrame.setStateOfDescriptorsMenu(true, paneNumber);
+                                mainFrame.setStateOfProjectionMenu(true, paneNumber);
                                 boolean sameTypeOfDescriptors = true;
                                 if (paneNumber == MainFrame.FIRST_IMAGE_PANEL) {
                                     sameTypeOfDescriptors = mainFrame.setFirstDescriptorsLoaded(true);

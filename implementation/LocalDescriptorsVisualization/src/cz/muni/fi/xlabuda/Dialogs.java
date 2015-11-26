@@ -147,13 +147,30 @@ public class Dialogs {
     }
 
     public static void hooveredDescriptorColorChooserDialog(MainFrame frame) {
-        GlasspaneForSimilarDescriptors glasspane = (GlasspaneForSimilarDescriptors) frame.getGlassPane();
-        Color newColor = JColorChooser.showDialog(
-                     frame, localLanguage.getString("cchd_title"),
-                     glasspane.getHooverColor());
-        if (newColor != null) {
-            glasspane.setHooverColor(newColor);
+        if(frame.getVisualizationType() == MainFrame.VisualisationType.NEEDLEMANWUNSCH ||
+                frame.getVisualizationType() == MainFrame.VisualisationType.NEEDLEMANWUNSCH){
+        
+            ProjectionGlassPane glasspane = (ProjectionGlassPane) frame.getGlassPane();
+            Color newColor = JColorChooser.showDialog(
+                    frame, localLanguage.getString("cchd_title"),
+                    glasspane.getHooverColor());
+            if (newColor != null) {
+                glasspane.setHooverColor(newColor);
+            }
+        
+        
+        
+        } else {
+            GlasspaneForSimilarDescriptors glasspane = (GlasspaneForSimilarDescriptors) frame.getGlassPane();
+            Color newColor = JColorChooser.showDialog(
+                    frame, localLanguage.getString("cchd_title"),
+                    glasspane.getHooverColor());
+            if (newColor != null) {
+                glasspane.setHooverColor(newColor);
+            }
+
         }
+
     }
 
     public static void absoluteLocationDialog(final Component parentComponent, final LocalDescriptors descriptors) {

@@ -347,5 +347,12 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
         }
     }
     
+    public void clear(){
+        dataList = null;
+        dataMap = null;
+        revalidate();
+        repaint();
+    }
+    
 
 }

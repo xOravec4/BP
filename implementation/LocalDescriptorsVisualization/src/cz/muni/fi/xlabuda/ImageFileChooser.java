@@ -114,6 +114,7 @@ public class ImageFileChooser extends JDialog{
                     MainFrame mainFrame = (MainFrame) imagePanel.getParentImageScrollPane().getParentMainFrame();
                     mainFrame.setStateOfImageMenu(true, paneNumber);
                     mainFrame.setStateOfDescriptorsMenu(false, paneNumber);
+                    mainFrame.setStateOfProjectionMenu(false, paneNumber);
 
                     dispose();
                     if (!AutomaticDescriptorsSelector.loadDescriptors(imagePanel, paneNumber)) {

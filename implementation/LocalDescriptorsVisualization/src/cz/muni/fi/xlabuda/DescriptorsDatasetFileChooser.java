@@ -244,6 +244,7 @@ public class DescriptorsDatasetFileChooser extends JDialog {
                         panel.getParentImageScrollPane().setDescriptorsLabels();
                         MainFrame mainFrame = panel.getParentImageScrollPane().getParentMainFrame();
                         mainFrame.setStateOfDescriptorsMenu(true, paneNumber);
+                        mainFrame.setStateOfProjectionMenu(true, paneNumber);
                         boolean sameTypeOfDescriptors = true;
                         if (paneNumber == MainFrame.FIRST_IMAGE_PANEL) {
                             sameTypeOfDescriptors = mainFrame.setFirstDescriptorsLoaded(true);

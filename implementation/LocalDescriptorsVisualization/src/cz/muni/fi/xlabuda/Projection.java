@@ -89,23 +89,31 @@ public class Projection  {
                 System.out.println("a");
                 continue;
             }
+            
             for(int i=0;i<keys.size();i++){
-                if( entry.getValue() <= values.get(i)){
-                    keys.add(i, entry.getKey());
-                    values.add(i, entry.getValue());
+                if( entry.getValue() >= values.get(i)){
+                    keys.add(i+1, entry.getKey());
+                    values.add(i+1, entry.getValue());
                     System.out.println("b");
                     break;
                 }
                 if(i==keys.size()-1){
-                    keys.add(i, entry.getKey());
-                    values.add(i, entry.getValue());
+                    keys.add( entry.getKey());
+                    values.add( entry.getValue());
                     System.out.println("c");
                     break;
                 }
                 
-            }            
+            }   
+            
+            
+            
         }
-        
+        System.out.println("STARt");
+        for(int i=0;i<values.size();i++){
+            System.out.println(values.get(i));
+        }
+        System.out.println("STOP");
         return keys;
         
         

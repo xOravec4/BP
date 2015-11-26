@@ -952,6 +952,12 @@ public class ImageScrollPane extends JPanel {
     public int getTopPanelHeight(){
         return topPanel.getHeight();
     }
+    
+    public void resetProjection(){
+        bottomProjectionPanel.setVisible(false);
+        sideProjectionPanel.setVisible(false);
+        getImagePanel().getDescriptors().cancelProjection();
+    }
 
     
     

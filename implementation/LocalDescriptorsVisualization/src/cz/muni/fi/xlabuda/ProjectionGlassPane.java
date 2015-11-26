@@ -53,6 +53,8 @@ public class ProjectionGlassPane extends JComponent {
     ImageScrollPane secondImageScrollPane;
     ImageScrollPane activeImageScrollPane;
     
+    private boolean antialiasing = false;
+    private Color descriptorColor = Color.RED;
     
     private enum Mode {singleImageProjection, twoImageVisualization};
     Mode mode;
@@ -147,9 +149,15 @@ public class ProjectionGlassPane extends JComponent {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.RED);
+        g2d.setColor(descriptorColor);
         g2d.setStroke(new BasicStroke(2));
         g2d.drawString("Glasspane", 0, 455);
+        
+        if (antialiasing) {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        } else {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        }
 
         if (descriptor != null) {
 
@@ -347,5 +355,16 @@ public class ProjectionGlassPane extends JComponent {
             }
         }
         */
+    }
+    public void setAntialiasing(boolean bool){
+        antialiasing = bool;
+    }
+    
+    public Color getHooverColor(){
+        return descriptorColor;
+    }
+    
+    public void setHooverColor(Color color){
+        descriptorColor = color;
     }
 }
