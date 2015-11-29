@@ -1,12 +1,20 @@
 package cz.muni.fi.xlabuda;
 
+import cz.muni.fi.xlabuda.MainFrame.VisualisationType;
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+import javafx.scene.control.RadioButton;
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -15,10 +23,12 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import messif.objects.impl.ObjectFeature;
 
 /**
  * Input and other dialogs for main frame.
@@ -423,6 +433,8 @@ public class Dialogs {
     }
 
     public static void shapeSizeSilderDialog(MainFrame parentFrame, final LocalDescriptors descriptors) {
+        
+        
         final JDialog dialog;
         final JOptionPane optionPane = new JOptionPane();
         final JSlider slider = new JSlider();
@@ -454,4 +466,130 @@ public class Dialogs {
 
         dialog.setVisible(true);
     }
+    
+     public static void ProjectionSelection(final MainFrame frame, final int algorithm) {
+        
+        final JDialog dialog;
+        final JOptionPane optionPane = new JOptionPane();
+        
+        
+        
+        final JRadioButton optionToX = new JRadioButton("Projection to X");
+        final JRadioButton optionToY = new JRadioButton("Projection to Y");
+        final JRadioButton optionDefined = new JRadioButton("Use current projections");
+ 
+        ButtonGroup group = new ButtonGroup();
+        group.add(optionToX);
+        group.add(optionToY);
+        group.add(optionDefined);
+        
+        JPanel asd = new JPanel();
+        asd.setLayout(new BoxLayout(asd, BoxLayout.PAGE_AXIS));
+        asd.add(optionToX);
+        asd.add(optionToY);
+        asd.add(optionDefined);
+        
+        if(!frame.bothProjectionsSet()){
+            optionDefined.setEnabled(false);
+            optionDefined.setText("Use current projections (one or both projections are not enabled)");
+        }
+
+        final JButton approveButton = new JButton();
+        approveButton.setText(localLanguage.getString("button"));
+        
+        
+        if(!frame.bothProjectionsSet()){
+            optionDefined.setEnabled(false);
+        }
+        approveButton.setEnabled(false);
+
+        optionPane.setMessage(new Object[] {"Choose projection:", asd});
+        optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
+        optionPane.setOptions(new Object[] {approveButton});
+
+        optionToX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                approveButton.setEnabled(true);
+            }
+        });
+        optionToY.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                approveButton.setEnabled(true);
+            }
+        });
+        optionDefined.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                approveButton.setEnabled(true);
+            }
+        });
+
+        dialog = optionPane.createDialog(frame, "Projection selection");
+        
+        approveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                
+                frame.setVisualisationType(algorithm);
+                System.out.println("algp"+algorithm);
+                
+                Projection projection1 = null;
+                Projection projection2 = null;
+                Set <ObjectFeature> first = frame.getFirstScrollPane().getImagePanel().getDescriptors().getVisibleDescriptors();
+                Set <ObjectFeature> second = frame.getSecondScrollPane().getImagePanel().getDescriptors().getVisibleDescriptors();
+                
+                
+                if(optionToX.isSelected()){
+                System.out.println("X");
+                    projection1 = new Projection(ProjectionTo.X);
+                    projection2 = new Projection(ProjectionTo.X);
+                }
+                else if(optionToY.isSelected()){
+                System.out.println("Y");
+                    projection1 = new Projection(ProjectionTo.Y);
+                    projection2 = new Projection(ProjectionTo.Y);
+                }
+                else if(optionDefined.isSelected()){
+                System.out.println("DEF");
+                    projection1 = frame.getFirstScrollPane().getImagePanel().getDescriptors().getProjection();
+                    projection2 = frame.getSecondScrollPane().getImagePanel().getDescriptors().getProjection();
+                }
+                
+                
+                frame.setProjectionGlassPane();
+                List<ObjectFeature> a1 = projection1.getSortedProjection(first);
+                List<ObjectFeature> a2 = projection2.getSortedProjection(first);
+                
+                List<ObjectFeature> result1 = null;
+                List<ObjectFeature> result2 = null;
+                if(algorithm == 1){
+                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( projection1.getSortedProjection(first),  projection2.getSortedProjection(second)); 
+                    result1 = needlemanWunsch.getFirstSequence();
+                    result2 = needlemanWunsch.getSecondSequence();
+                }
+                else if(algorithm == 2){
+                    SmithWaterman smithWaterman = new SmithWaterman( projection1.getSortedProjection(first),  projection2.getSortedProjection(second)); 
+                    result1 = smithWaterman.getFirstSequence();
+                    result2 = smithWaterman.getSecondSequence();
+                
+                }
+                 
+                frame.setComparationMode(true);
+                frame.getFirstScrollPane().getBottomProjectionPanel().setData(result1);
+                frame.getFirstScrollPane().getSideProjectionPanel().setData(result1);
+                frame.getSecondScrollPane().getBottomProjectionPanel().setData(result2);
+                frame.getSecondScrollPane().getSideProjectionPanel().setData(result2);
+                
+                
+                frame.getFirstScrollPane().SetBottomProjectionPanelVisible();
+                frame.getSecondScrollPane().SetBottomProjectionPanelVisible();
+                frame.getFirstScrollPane().SetSideProjectionPanelInvisible();
+                frame.getSecondScrollPane().SetSideProjectionPanelInvisible();
+                dialog.dispose();
+            }
+        });
+        
+        
+        
+        dialog.setVisible(true);
+
+     }
 }

@@ -524,6 +524,13 @@ public abstract class LocalDescriptors {
             draw(graphics, iterator.next());
         }
         
+        if(projection != null){
+            checkProjection();
+        }
+        
+        
+        /*
+        
         int longAx = ProjectionPointAx;
         int longAy = ProjectionPointAy;
         int longBx = ProjectionPointBx;
@@ -537,14 +544,15 @@ public abstract class LocalDescriptors {
             longBy += ProjectionPointBy - ProjectionPointAy;
         }
         
-        
+        */
         //predlzenie 
         //////////
 //        Projection projection = new Projection (ProjectionTo.X);
        // Map<ObjectFeature, Float> visibleProjection = projection.getProjection(visibleDescriptors);
         
+    
         
-        if(projection != null){
+      /*  if(projection != null){
             Map<ObjectFeature, Float> visibleProjection = new HashMap<ObjectFeature, Float>();
            //Projection projection = new Projection (ProjectionTo.Y);
            visibleProjection = projection.getProjection(visibleDescriptors);
@@ -557,10 +565,9 @@ public abstract class LocalDescriptors {
                 
                sideProjectionPanel.setPosition("side");
                 sideProjectionPanel.setData(visibleProjection);
-                sideProjectionPanel.repaint();
-                
+                sideProjectionPanel.repaint();       
         }
-        
+       */ 
        /*
         Point2D left =  Projection.nearestPointOnLine2(longAx, longAy, longBx, longBy,
                 parentImagePanel.getParentImageScrollPane().getScrollPane().getHorizontalScrollBar().getValue(),
@@ -916,11 +923,57 @@ public abstract class LocalDescriptors {
        System.out.println("BBBBBBBBBBBBBBBBB");
     }
     
-    public void setProjectionType(ProjectionTo projectionTo){
+    public void setProjection(ProjectionTo projectionTo){
+        System.out.println("Setting projection");
         projection = new Projection(projectionTo);
     }
     
+    public void setProjection(ProjectionTo projectionTo, Point2D a, Point2D b){
+        System.out.println("Setting projection");
+        projection = new Projection(projectionTo, a, b);
+    }
+    
+    
+    public void checkProjection(){
+        
+        if(projection == null)
+            return;
+        
+        Map <ObjectFeature, Float> proj = null;
+        if(projection.getProjectionType() == ProjectionTo.CUSTOM){
+            proj = projection.getProjection(visibleDescriptors,
+                        getParentImagePanel().getImage().getWidth(),
+                        getParentImagePanel().getImage().getHeight(),
+                        getParentImagePanel().getFirstProjectionPoint(),
+                        getParentImagePanel().getSecondProjectionPoint()
+                        );
+        }
+        else{
+            proj =  projection.getProjection(visibleDescriptors);
+        }
+        ProjectionPanel bottomProjectionPanel = parentImagePanel.getParentImageScrollPane().getBottomProjectionPanel();
+        ProjectionPanel sideProjectionPanel = parentImagePanel.getParentImageScrollPane().getSideProjectionPanel();
+        bottomProjectionPanel.setData(proj);
+        sideProjectionPanel.setData(proj);
+        bottomProjectionPanel.repaint();
+        sideProjectionPanel.repaint();
+    }
+    
     public void cancelProjection(){
+        System.out.println("Setting sett to null");
         projection = null;
+    }
+    
+    public ProjectionTo getProjectionType(){
+        if(projection == null){
+            return null;
+        }
+        else{
+            return projection.getProjectionType();
+        }
+    }
+    
+    public Projection getProjection(){
+        return projection; 
     }
 }

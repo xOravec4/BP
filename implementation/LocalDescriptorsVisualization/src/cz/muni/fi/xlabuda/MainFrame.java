@@ -11,6 +11,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 import static java.util.Collections.list;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -73,8 +74,9 @@ public class MainFrame extends JFrame {
     public static final int FIRST_IMAGE_PANEL = 1;
     public static final int SECOND_IMAGE_PANEL = 2;
     
-    public enum VisualisationType {PRVA, SMITHWATERMAN, NEEDLEMANWUNSCH};
+    public enum VisualisationType {PRVA, NEEDLEMANWUNSCH, SMITHWATERMAN};
     VisualisationType visualisationType;
+    private Projection projection = null;
 
 
     //******************** ATTRIBUTES ********************//
@@ -115,6 +117,9 @@ public class MainFrame extends JFrame {
     
     private JMenu compareDescriptorsMenu;
 
+    
+    private JMenuItem test; //DELETE!
+    
     private JMenu projectionMenu; //moje
     private JMenu projectionFirstImage;
     private JMenu projectionSecondImage;
@@ -269,7 +274,7 @@ public class MainFrame extends JFrame {
         compareDescriptorsMenu = new JMenu();
 
         helpMenu = new JMenu();
-
+        test = new JMenuItem();
         projectionMenu = new JMenu();
         projectionFirstImage = new JMenu();
         projectionSecondImage = new JMenu();
@@ -621,7 +626,7 @@ public class MainFrame extends JFrame {
             }
         });
         
-        showSimilarDescriptorsChoice.setText("Choose visualization:");
+        showSimilarDescriptorsChoice.setText("Show similar descriptors");
 
         showSimilarDescriptors.setText(localLanguage.getString("mb_show_similar"));
         showSimilarDescriptors.addActionListener(new java.awt.event.ActionListener() {
@@ -702,31 +707,7 @@ public class MainFrame extends JFrame {
          smithWatermanButton.setText("SmithWaterman");
          smithWatermanButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-           visualisationType = VisualisationType.NEEDLEMANWUNSCH;
-            setComparationMode(true);
-            
-           Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-           Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-           
-           Projection proj = new Projection(ProjectionTo.X);
-
-           SmithWaterman smithWaterman = new SmithWaterman( proj.getSortedProjection(first),  proj.getSortedProjection(second));         
-            
-           projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
-                setGlassPane(projectionGlassPane);
-                projectionGlassPane.setEnabled(true);
-                projectionGlassPane.setVisible(true);
-                
-           imageScrollPane.getBottomProjectionPanel().setData(smithWaterman.getFirstSequence());
-           imageScrollPane.getSideProjectionPanel().setData(smithWaterman.getFirstSequence());
-           secondImageScrollPane.getBottomProjectionPanel().setData(smithWaterman.getSecondSequence());
-           secondImageScrollPane.getSideProjectionPanel().setData(smithWaterman.getSecondSequence());
-           
-           imageScrollPane.SetBottomProjectionPanelVisible();
-           secondImageScrollPane.SetBottomProjectionPanelVisible();
-           imageScrollPane.SetSideProjectionPanelInvisible();
-           secondImageScrollPane.SetSideProjectionPanelInvisible();
-           revalidate();
+                Dialogs.ProjectionSelection(thisInstance, VisualisationType.SMITHWATERMAN.ordinal());
             }
         
         
@@ -735,43 +716,20 @@ public class MainFrame extends JFrame {
         needlemanWunschButton.setText("NeedlemanWunsch");
         needlemanWunschButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-           visualisationType = VisualisationType.NEEDLEMANWUNSCH;
-            setComparationMode(true);
-           Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-           Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-           
-           Projection proj = new Projection(ProjectionTo.X);
-
-           NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( proj.getSortedProjection(first),  proj.getSortedProjection(second));         
-            
-           projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
-                setGlassPane(projectionGlassPane);
-                projectionGlassPane.setEnabled(true);
-                projectionGlassPane.setVisible(true);
-                
-           imageScrollPane.getBottomProjectionPanel().setData(needlemanWunsch.getFirstSequence());
-           imageScrollPane.getSideProjectionPanel().setData(needlemanWunsch.getFirstSequence());
-           secondImageScrollPane.getBottomProjectionPanel().setData(needlemanWunsch.getSecondSequence());
-           secondImageScrollPane.getSideProjectionPanel().setData(needlemanWunsch.getSecondSequence());
-           
-           imageScrollPane.SetBottomProjectionPanelVisible();
-           secondImageScrollPane.SetBottomProjectionPanelVisible();
-           imageScrollPane.SetSideProjectionPanelInvisible();
-           secondImageScrollPane.SetSideProjectionPanelInvisible();
-           revalidate();
+                Dialogs.ProjectionSelection(thisInstance, VisualisationType.NEEDLEMANWUNSCH.ordinal());
             }
-        
-        
         });
+        
+
         
         projectionFirstImageToX.setText("To X");
         projectionFirstImageToX.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-                imageScrollPane.getImagePanel().getDescriptors().setProjectionType(ProjectionTo.X);               
-                projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
-                setGlassPane(projectionGlassPane);
-                projectionGlassPane.setEnabled(true);
-                projectionGlassPane.setVisible(true);
+                resetProjection(imageScrollPane);
+                imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.X);
+                
+                setProjectionGlassPane();
+               
                 if(!imageScrollPane.isProjectionVisible()){
                     imageScrollPane.SetBottomProjectionPanelVisible();
                 }
@@ -784,11 +742,11 @@ public class MainFrame extends JFrame {
         projectionSecondImageToX.setText("To X");
         projectionSecondImageToX.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-                secondImageScrollPane.getImagePanel().getDescriptors().setProjectionType(ProjectionTo.X);               
-                projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
-                setGlassPane(projectionGlassPane);
-                projectionGlassPane.setEnabled(true);
-                projectionGlassPane.setVisible(true);
+                resetProjection(secondImageScrollPane);
+                secondImageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.X);  
+                
+                setProjectionGlassPane();
+                
                 if(!secondImageScrollPane.isProjectionVisible()){
                     secondImageScrollPane.SetBottomProjectionPanelVisible();
                 }
@@ -800,12 +758,12 @@ public class MainFrame extends JFrame {
         
         projectionFirstImageToY.setText("To Y");
         projectionFirstImageToY.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(ActionEvent event) {              
-                imageScrollPane.getImagePanel().getDescriptors().setProjectionType(ProjectionTo.Y);               
-                projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
-                setGlassPane(projectionGlassPane);
-                projectionGlassPane.setEnabled(true);
-                projectionGlassPane.setVisible(true);
+        public void actionPerformed(ActionEvent event) { 
+                resetProjection(imageScrollPane);
+                imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.Y); 
+                
+                setProjectionGlassPane();
+                
                 if(!imageScrollPane.isProjectionVisible()){
                     imageScrollPane.SetBottomProjectionPanelVisible();
                 }
@@ -817,12 +775,12 @@ public class MainFrame extends JFrame {
         
         projectionSecondImageToY.setText("To Y");
         projectionSecondImageToY.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(ActionEvent event) {              
-                secondImageScrollPane.getImagePanel().getDescriptors().setProjectionType(ProjectionTo.Y);               
-                projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
-                setGlassPane(projectionGlassPane);
-                projectionGlassPane.setEnabled(true);
-                projectionGlassPane.setVisible(true);
+        public void actionPerformed(ActionEvent event) {   
+                resetProjection(secondImageScrollPane);
+                secondImageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.Y);               
+                
+                setProjectionGlassPane();
+                
                 if(!secondImageScrollPane.isProjectionVisible()){
                     secondImageScrollPane.SetBottomProjectionPanelVisible();
                 }
@@ -833,7 +791,51 @@ public class MainFrame extends JFrame {
         });
         
         projectionFirstImageCustom.setText("Custom");
+        projectionFirstImageCustom.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent event) {                   
+                resetProjection(imageScrollPane);
+                
+                imageScrollPane.getImagePanel().showProjectionPoints();
+                
+                setProjectionGlassPane();
+                Point2D a = imageScrollPane.getImagePanel().getFirstProjectionPoint();
+                Point2D b = imageScrollPane.getImagePanel().getSecondProjectionPoint();
+                imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.CUSTOM, a, b); 
+                
+
+                imageScrollPane.getBottomProjectionPanel().setVisible(true);
+                imageScrollPane.getBottomProjectionPanel().repaint();
+                
+                projectionFirstImageToX.setSelected(false);
+                projectionFirstImageToY.setSelected(false);
+
+            revalidate();
+            }
+            
+        });
         projectionSecondImageCustom.setText("Custom");
+        projectionSecondImageCustom.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent event) {                   
+                resetProjection(secondImageScrollPane);
+                
+                secondImageScrollPane.getImagePanel().showProjectionPoints();
+                
+                setProjectionGlassPane();
+                Point2D a = secondImageScrollPane.getImagePanel().getFirstProjectionPoint();
+                Point2D b = secondImageScrollPane.getImagePanel().getSecondProjectionPoint();
+                secondImageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.CUSTOM, a, b); 
+                
+
+                secondImageScrollPane.getBottomProjectionPanel().setVisible(true);
+                secondImageScrollPane.getBottomProjectionPanel().repaint();
+                
+                projectionSecondImageToX.setSelected(false);
+                projectionSecondImageToY.setSelected(false);
+
+            revalidate();
+            }
+            
+        });
         
         projectionTogglePositionFirstImage.setText("Toggle");
         projectionTogglePositionFirstImage.addActionListener(new java.awt.event.ActionListener() {
@@ -860,6 +862,15 @@ public class MainFrame extends JFrame {
                     secondImageScrollPane.getSideProjectionPanel().setVisible(true);
                     secondImageScrollPane.getBottomProjectionPanel().setVisible(false);
                 }
+            }
+        });
+        
+        test.setText("test");
+        test.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                System.out.println("asdsasd");
+                Dialogs.ProjectionSelection(thisInstance,1);
+              //  imageScrollPane.
             }
         });
 
@@ -1149,6 +1160,7 @@ public class MainFrame extends JFrame {
         menuBar.add(modeMenu);
         menuBar.add(projectionMenu);
         menuBar.add(helpMenu);
+        menuBar.add(test);
       
         setJMenuBar(menuBar);
         
@@ -1479,6 +1491,15 @@ public class MainFrame extends JFrame {
     public boolean getOneImageMode() {
         return oneImageMode;
     }
+    
+    public void setComparationMode(boolean turnedOn, boolean resetProjections) {
+        if(resetProjections){
+            imageScrollPane.resetProjection();
+            secondImageScrollPane.resetProjection();
+        }
+        setComparationMode(turnedOn);
+    }
+    
 
     public void setComparationMode(boolean turnedOn) {
         
@@ -1614,6 +1635,90 @@ public class MainFrame extends JFrame {
     public VisualisationType getVisualizationType(){
         return visualisationType;
     }
+
+    public void revalidateProjection() {
+        
+        if(true) return;
+        System.out.println("Revalidating1");
+        if(projection == null)
+            return;
+        System.out.println(projection.getProjectionType());
+        if(projection.getProjectionType() != ProjectionTo.CUSTOM){
+             Map<ObjectFeature, Float> visibleProjection = projection.getProjection(imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors());
+             imageScrollPane.getBottomProjectionPanel().setData(visibleProjection);
+            imageScrollPane.getSideProjectionPanel().setData(visibleProjection);
+            revalidate();
+            
+            
+            return;
+        }
+        System.out.println("Revalidating3");
+        
+        Point2D a = imageScrollPane.getImagePanel().getFirstProjectionPoint();
+        Point2D b = imageScrollPane.getImagePanel().getSecondProjectionPoint();
+        System.out.println("asdsa " + a+ " " + b);
+        projection.setProjectionPoints(a, b);
+        /*Map<ObjectFeature, Float> visibleProjection = projection.getProjection(imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors(),
+                imageScrollPane.getImagePanel().getImage().getWidth(),
+                imageScrollPane.getImagePanel().getImage().getHeight()
+                );*/
+       // imageScrollPane.getBottomProjectionPanel().setData(visibleProjection);
+       // imageScrollPane.getSideProjectionPanel().setData(visibleProjection);
+        revalidate();
+    }
+    
+    public void resetProjection(ImageScrollPane isp){
+        ProjectionTo type = isp.getImagePanel().getDescriptors().getProjectionType();
+        if( type == ProjectionTo.CUSTOM){
+            isp.getImagePanel().HideCustomProjectionPoints();
+            
+        }
+        isp.getImagePanel().getDescriptors().cancelProjection();
+        isp.hideProjectionPanels();
+        if(isp == imageScrollPane){
+            projectionFirstImageToX.setSelected(false);
+            projectionFirstImageToY.setSelected(false);
+            projectionFirstImageCustom.setSelected(false);
+        }
+        if(isp == secondImageScrollPane){
+            projectionSecondImageToX.setSelected(false);
+            projectionSecondImageToY.setSelected(false);
+            projectionSecondImageCustom.setSelected(false);
+        }
+        
+    }
+    
+    public boolean bothProjectionsSet(){
+        if(imageScrollPane.getImagePanel().getDescriptors() != null)
+            if(imageScrollPane.getImagePanel().getDescriptors().getProjectionType() != null)
+                if(secondImageScrollPane.getImagePanel().getDescriptors() != null)
+                    if(secondImageScrollPane.getImagePanel().getDescriptors().getProjectionType() != null)
+                        return true;
+        return false;
+    }
+    
+    public void setProjectionGlassPane(){
+     
+        projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
+        setGlassPane(projectionGlassPane);
+        projectionGlassPane.setEnabled(true);
+        projectionGlassPane.setVisible(true);
+        revalidate();
+    }
+    
+    public void setVisualisationType(VisualisationType visualisationType){
+        this.visualisationType = visualisationType;
+    }
+    
+    public void setVisualisationType(int i){
+        if (i ==0)
+        this.visualisationType = VisualisationType.PRVA;
+        if (i == 1)
+        this.visualisationType = VisualisationType.NEEDLEMANWUNSCH;
+        if (i == 2)
+        this.visualisationType = VisualisationType.SMITHWATERMAN;
+    }
+    
     
     
 }

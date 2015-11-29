@@ -30,12 +30,32 @@ public class Projection  {
     
     
     private ProjectionTo projectionTo;
+    private Point2D custonProjectionFirstPoint;
+    private Point2D custonProjectionSecondPoint;
     //private Map<ObjectFeature, Float> result;
     
     public Projection(ProjectionTo projectionTo)
     {
        this.projectionTo = projectionTo;
+       custonProjectionFirstPoint = null;
+       custonProjectionSecondPoint = null;
     }
+    
+    public Projection(ProjectionTo projectionTo, Point2D custonProjectionFirstPoint, Point2D custonProjectionSecondPoint)
+    {
+       this.projectionTo = ProjectionTo.CUSTOM;
+       this.custonProjectionFirstPoint = custonProjectionFirstPoint;
+       this.custonProjectionSecondPoint = custonProjectionSecondPoint;
+    }
+    
+    public void setProjectionPoints(Point2D custonProjectionFirstPoint, Point2D custonProjectionSecondPoint)
+    {
+       this.custonProjectionFirstPoint = custonProjectionFirstPoint;
+       //this.custonProjectionFirstPoint = new Point2D()
+       this.custonProjectionSecondPoint = custonProjectionSecondPoint;
+    }
+    
+
     
     public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList)
     {
@@ -53,11 +73,46 @@ public class Projection  {
                 for(ObjectFeature objectFeature : objFeatureList)
                 {
                     result.put(objectFeature, objectFeature.getY());
+                    
+                }
+                return result;
+            case CUSTOM:
+                for(ObjectFeature objectFeature : objFeatureList)
+                {
+                    result.put(objectFeature, nearestPointOnLine(custonProjectionFirstPoint.getX(), custonProjectionFirstPoint.getY(),
+                            custonProjectionSecondPoint.getX(), custonProjectionSecondPoint.getY(),
+                            objectFeature.getX()* 500, objectFeature.getY() * 500));
+                    System.out.println(nearestPointOnLine(custonProjectionFirstPoint.getX(), custonProjectionFirstPoint.getY(),
+                            custonProjectionSecondPoint.getX(), custonProjectionSecondPoint.getY(),
+                            objectFeature.getX() * 500, objectFeature.getY() * 500));
                 }
                 return result;
             default:
                 return null;
                 
+        }
+    }
+    
+     public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList, int imageWidth, int imageHeigt, Point2D A, Point2D B)
+    {
+        Map<ObjectFeature, Float> result = new HashMap<ObjectFeature, Float>();
+        
+        switch (projectionTo)
+        {
+           case CUSTOM:
+                for(ObjectFeature objectFeature : objFeatureList)
+                {
+                    result.put(objectFeature, nearestPointOnLine(A.getX(), A.getY(),
+                            B.getX(), B.getY(),
+                            objectFeature.getX()* imageWidth, objectFeature.getY() * imageHeigt));
+                    System.out.println(nearestPointOnLine(A.getX(), A.getY(),
+                            B.getX(), B.getY(),
+                            objectFeature.getX() * imageWidth, objectFeature.getY() * imageHeigt));
+                    
+                } 
+                return result;
+           default:
+                return null;
         }
     }
     
@@ -165,6 +220,11 @@ public class Projection  {
                         }
                 }
                 dest.setLocation(ax + abx * t, ay + aby * t);
+                
+                System.out.println("Input :" + ax + " " + ay + "  XX " + bx + " " + by+ "  XX " + px + " " + py);
+                
+                float result = (float) Math.sqrt(Math.pow((ax - dest.getX()), 2) + Math.pow((ay - dest.getY()), 2)) / (float) Math.sqrt(Math.pow((ax - bx), 2) + Math.pow((ay - by), 2));
+                System.out.println("Result  : " +  dest.getX() + " " + dest.getY() + "  vzdialenost: "+ result);
                // System.out.println(ax+" " + ay +" " + bx+" " + by +" " + px+" " + py +" RESULT:"+dest.getX()   );
                // return (float)dest.getX();
                 return (float) Math.sqrt(Math.pow((ax - dest.getX()), 2) + Math.pow((ay - dest.getY()), 2)) / (float) Math.sqrt(Math.pow((ax - bx), 2) + Math.pow((ay - by), 2));
@@ -195,7 +255,8 @@ public class Projection  {
                 return dest;
                // return (float) Math.sqrt(Math.pow((ax - dest.getX()), 2) + Math.pow((ay - dest.getY()), 2));
         }
-    
+        
+       // public static 
    /* public void sort()
     {
         Collections.sort(projectionDescriptors, new Comparator<ObjectFeature>() {
@@ -206,6 +267,9 @@ public class Projection  {
     });
     }*/
     
+    public ProjectionTo getProjectionType(){
+        return projectionTo;
+    }
 
     
 }
