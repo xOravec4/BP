@@ -35,6 +35,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import messif.objects.impl.ObjectFeature;
+import messif.objects.util.SequenceMatchingCost;
 
 /**
  *
@@ -52,6 +53,7 @@ public class ProjectionGlassPane extends JComponent {
     ImageScrollPane imageScrollPane;
     ImageScrollPane secondImageScrollPane;
     ImageScrollPane activeImageScrollPane;
+    MainFrame mainFrame;
     
     private boolean antialiasing = false;
     private Color descriptorColor = Color.RED;
@@ -64,6 +66,7 @@ public class ProjectionGlassPane extends JComponent {
     public ProjectionGlassPane(ImageScrollPane imageScrollPane, ImageScrollPane secondImageScrollPane){ 
         this.imageScrollPane = imageScrollPane;
         this.secondImageScrollPane = secondImageScrollPane;
+        mainFrame = imageScrollPane.getParentMainFrame();
         getParent();
        // super(null);
     }
@@ -104,6 +107,22 @@ public class ProjectionGlassPane extends JComponent {
         
     }
     
+    public Rectangle getViewportRange(ImageScrollPane scrollPane) {
+            double zoomScale = scrollPane.getImagePanel().getZoomScale();
+            Rectangle rect = scrollPane.getScrollPane().getViewport().getViewRect();
+            return new Rectangle(
+                    (int)(rect.getX() / zoomScale),
+                    (int) (rect.getY() / zoomScale),
+                    (int) (rect.getWidth() / zoomScale),
+                    (int) (rect.getHeight() / zoomScale));
+        }
+    
+    public boolean isInViewPort(ObjectFeature of, ImageScrollPane isp){
+        
+        Rectangle rec = getViewportRange(isp);
+        return rec.contains(new Point2D.Double(of.getX()*isp.getImagePanel().getImage().getWidth(), of.getY()*isp.getImagePanel().getImage().getHeight()));
+    }
+    
     private Point2D getDescriptorPosition(ImageScrollPane isp, ObjectFeature descriptor ){
         
         int xcord = Double.valueOf(isp.getImagePanel().getImage().getWidth() * descriptor.getX()).intValue();
@@ -127,11 +146,12 @@ public class ProjectionGlassPane extends JComponent {
         }
         
         ycord += imageScrollPane.getScrollPane().getY() + imageScrollPane.getY() + 22;
+        ycord += imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight();
 
         return new Point2D.Float(xcord,ycord);
     }
     
-    private ImageScrollPane getOtherISP(ImageScrollPane isp){
+    public ImageScrollPane getOtherISP(ImageScrollPane isp){
         if(isp == imageScrollPane)
             return secondImageScrollPane;
         else
@@ -210,6 +230,14 @@ public class ProjectionGlassPane extends JComponent {
              }
              */
             if (mode == Mode.singleImageProjection) {
+                
+                if(!isInViewPort(descriptor,activeImageScrollPane )){
+                    System.err.println("NOT IN VIEWPORT");
+                    return;
+                }
+                else
+                    System.err.println("IN VIEWPORT");
+                    
                 System.out.println("SIP:" + value);
                 Point2D descPos = getDescriptorPosition(activeImageScrollPane, descriptor);
                 if (activeImageScrollPane.getBottomProjectionPanel().isVisible()) {
@@ -233,64 +261,87 @@ public class ProjectionGlassPane extends JComponent {
                 ObjectFeature descriptor2 = getOtherISP(activeImageScrollPane).getBottomProjectionPanel().getDescriptorAt(order);
                 Point2D descPos = getDescriptorPosition(activeImageScrollPane, descriptor);
                 if (descriptor2 == null) {
+                    mainFrame.SetNWSWCurrentSimilarity(null);
+                    if(!(isInViewPort(descriptor,activeImageScrollPane ) )){
+                        return;
+                    }
                     if(activeImageScrollPane.getBottomProjectionPanel().isVisible())
                     g2d.drawLine((int) descPos.getX(),
                             (int) descPos.getY(),
                             (int) value + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
-                            imageScrollPane.getHeight() + 5
+                            imageScrollPane.getHeight() + 5 + + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
                     );
                     else
                     g2d.drawLine((int) descPos.getX(),
                             (int) descPos.getY(),
                             10 + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
-                            (int) value + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22
+                            (int) value + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22 + + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
                     );
                     return;
                 }
-
+                SequenceMatchingCost cost = SequenceMatchingCost.SIFT_DEFAULT;
+                mainFrame.SetNWSWCurrentSimilarity(cost.getCost(descriptor, descriptor2));
                 Point2D descPos2 = getDescriptorPosition(getOtherISP(activeImageScrollPane), descriptor2);
                 if (activeImageScrollPane.getBottomProjectionPanel().isVisible()) {
                     System.out.println("a");
-                    g2d.drawLine((int) descPos.getX(),
+                    if((isInViewPort(descriptor,activeImageScrollPane ) )){
+                        g2d.drawLine((int) descPos.getX(),
                             (int) descPos.getY(),
                             (int) value + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
-                            imageScrollPane.getHeight() + 5
+                            imageScrollPane.getHeight() + 5 + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
                     );
+                    }
+                    
                 } else if (activeImageScrollPane.getSideProjectionPanel().isVisible()) {
-                    System.out.println("b");
-                    g2d.drawLine((int) descPos.getX(),
-                            (int) descPos.getY(),
-                            10 + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
-                            (int) value + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22
-                    );
+                    if((isInViewPort(descriptor,activeImageScrollPane ) )){
+                        System.out.println("b");
+                        g2d.drawLine((int) descPos.getX(),
+                                (int) descPos.getY(),
+                                10 + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
+                                (int) value + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22 + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
+                        );
+                    }
+
                 }
                 
                 if (getOtherISP(activeImageScrollPane).getBottomProjectionPanel().isVisible()) {
                     int value2 = getOtherISP(activeImageScrollPane).getBottomProjectionPanel().getDescriptorValueAt(order);
                     System.out.println("c");
-                    g2d.drawLine((int) descPos2.getX(),
+                    if((isInViewPort(descriptor2,getOtherISP(activeImageScrollPane) ) )){
+                        g2d.drawLine((int) descPos2.getX(),
                             (int) descPos2.getY(),
                             (int) value2 + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(getOtherISP(activeImageScrollPane)),
-                            imageScrollPane.getHeight() + 5
-                    );
+                            imageScrollPane.getHeight() + 5 + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
+                        );
+                    }
+                    
                 } else if (getOtherISP(activeImageScrollPane).getSideProjectionPanel().isVisible()) {
                     int value2 = getOtherISP(activeImageScrollPane).getSideProjectionPanel().getDescriptorValueAt(order);
                     System.out.println("d");
-                    g2d.drawLine((int) descPos2.getX(),
+                    if((isInViewPort(descriptor2,getOtherISP(activeImageScrollPane) ) )){
+                        g2d.drawLine((int) descPos2.getX(),
                             (int) descPos2.getY(),
                             10 + getSecondPaneAlligment(getOtherISP(activeImageScrollPane)),
-                            (int) value2 + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22
+                            (int) value2 + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22 + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
                     );
+                    }
+                    
                 }
-
-                g2d.drawLine((int) descPos.getX(),
+                
+                if(isInViewPort(descriptor,activeImageScrollPane ) && isInViewPort(descriptor2, getOtherISP(activeImageScrollPane)) ){
+                    g2d.drawLine((int) descPos.getX(),
                         (int) descPos.getY(),
                         (int) descPos2.getX(),
                         (int) descPos2.getY()
-                );
+                    );
+                }
+                
 
             }
 
+        }
+        else{
+                mainFrame.SetNWSWCurrentSimilarity(null);
         }
 
         /*

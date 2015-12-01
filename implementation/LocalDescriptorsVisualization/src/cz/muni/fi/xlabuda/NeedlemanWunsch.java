@@ -41,33 +41,47 @@ public class NeedlemanWunsch {
     
     NeedlemanWunsch(SequenceMatchingCost cost, List <ObjectFeature> list1,  List <ObjectFeature> list2){
         
+        //list1 = list2;
         
-        
-        
-        //list2 = new ArrayList(list1);
-        /*
-        for(int i=0;i<list1.size()-1;i++){
-            if(list1.get(i).getX() < list1.get(i+1).getX()){
-                
-            }
-            else
-                System.out.println("JEDNA ERROR");
+        if(list1.equals(list2)){
+            System.out.println("EQUALS");
         }
+        else
+            System.out.println("NOT EQUALS");
         
-        for(int i=0;i<list2.size()-1;i++){
-            if(list2.get(i).getX() < list2.get(i+1).getX()){
-                
-            }
-            else
-                System.out.println("DVA ERROR");
-        }*/
+        System.out.println("PRINT TWO INPUT LISTS START");
         /*
         for(int i=0;i<list1.size();i++){
-            if(list1.get(i).getX() == list2.get(i).getX())
-                System.out.println(i + ")  " + list1.get(i).getX() + " " + list2.get(i).getX());
-            else
-                System.out.println(i + ")  " + list1.get(i).getX() + " " + list2.get(i).getX() + "CHYBAAAA");
+            System.out.print("VALUE: " + list1.get(i).getX() +" vs "+ list2.get(i).getX());
+            if(list1.get(i).getX() != list2.get(i).getX())
+                System.out.println("ERROOOOR value");
+            else{
+                System.out.println("OK");
+            }
+            if(list1.get(i).equals(list2.get(i)))
+                System.out.println("equals");
+            else{
+                System.out.println("ERROR deskriptory");
+            }
+        }
+                */
+        /*
+        for(int i=0;i<list1.size()-1;i++){
+
+            if(list1.get(i).getX() == list1.get(i+1).getX()){
+                System.out.println("ERRROOOOOOOOOOOR THE SAME " + list1.get(i).getX() + " " + list1.get(i+1).getX());
+                System.out.println(list1.get(i));
+                System.out.println();
+                System.out.println(list2.get(i));
+            
+            }
+            else{
+                System.out.println("ok, dif");
+            }
+
         }*/
+        System.out.println("PRINT TWO INPUT LISTS END");
+        
         
         int n = list1.size();       // length of this "string"
         int m = list2.size();       // length of o."string"
@@ -104,14 +118,7 @@ public class NeedlemanWunsch {
             }
             it2 = list2.iterator();
         }
-        /*
-        for(int i=0;i < n+1; i++){
-            for(int j=0;j < m+1;j++){
-                System.out.print(d[i][j] + " ");
-            }
-            System.out.println();
-        }
-        */
+
         
         int topIndex = n;
         int sideIndex = m;
@@ -150,14 +157,14 @@ public class NeedlemanWunsch {
                 topIndex--;
                 result1.add(list1.get(topIndex-1));
                 result2.add(null); 
-                System.out.println("a");
+                //System.out.println("a");
                 continue;
             }
             if(maxIndex == 3){
                 sideIndex--;
                 result1.add(null);
                 result2.add(list2.get(sideIndex-1)); 
-                System.out.println("b");
+                //System.out.println("b");
                 continue;
             }
             

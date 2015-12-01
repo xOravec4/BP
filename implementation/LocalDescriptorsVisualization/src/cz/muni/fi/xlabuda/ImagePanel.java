@@ -78,7 +78,8 @@ public final class ImagePanel extends JPanel {
             public void mouseDragged(MouseEvent e) {
 
                 if(projectionPointMoving == projectionPointMoving.FIRST){
-                    firstProjectionPoint = e.getPoint();
+                    firstProjectionPoint = new Point2D.Double(e.getX() / zoomScale, e.getY() / zoomScale);
+                    
                     if(firstProjectionPoint.getX() < 0)
                         firstProjectionPoint = new Point2D.Double(0, firstProjectionPoint.getY());
                     if(firstProjectionPoint.getY() < 0)
@@ -91,7 +92,7 @@ public final class ImagePanel extends JPanel {
                     return;
                 }
                 else if(projectionPointMoving == projectionPointMoving.SECOND){
-                    secondProjectionPoint = e.getPoint();
+                    secondProjectionPoint = new Point2D.Double(e.getX() / zoomScale, e.getY() / zoomScale);
                     if(secondProjectionPoint.getX() < 0)
                         secondProjectionPoint = new Point2D.Double(0, secondProjectionPoint.getY());
                     if(secondProjectionPoint.getY() < 0)
@@ -245,32 +246,38 @@ public final class ImagePanel extends JPanel {
                 }
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     
-                //System.out.println(e.getX() + " " + e.getY())  ;
+                //System.out.println(e.getX() + " " + e.getY())  ;/*
+                /*
                 if(firstProjectionPoint == null){
                 firstProjectionPoint = new Point2D.Double(e.getX(), e.getY());
                 }
                 else if(secondProjectionPoint == null){
                     secondProjectionPoint = new Point2D.Double(e.getX(), e.getY());
-                }
+                }*/
                 repaint();
-                //descriptors.setProjectionPointA(e.getX(),e.getY() );
+                
                 }
                 if (e.getButton() == MouseEvent.BUTTON3) {
                 descriptors.setProjectionPointB(e.getX(),e.getY() );
                 descriptors.hideNearestDescriptors(new Point(0,0));
                 }
-                //System.out.println("aaaaaaaaaa"+e.getX()+" "+e.getY());
+                
             }
 
             public void mousePressed(MouseEvent e) {
+                
                 if(firstProjectionPoint != null){
-                    int distance = (int)Math.sqrt((e.getX()-firstProjectionPoint.getX())*(e.getX()-firstProjectionPoint.getX())+(e.getY()-firstProjectionPoint.getY())*(e.getY()-firstProjectionPoint.getY()));
+
+                    System.err.println(firstProjectionPoint.getX() *zoomScale + " " + firstProjectionPoint.getY() *zoomScale+ " vs " + e.getX() + " " + e.getY());
+                    //int distance = (int)Math.sqrt((mouseX-firstProjectionPoint.getX())*(mouseX-firstProjectionPoint.getX())+(mouseY-firstProjectionPoint.getY())*(mouseY-firstProjectionPoint.getY()));
+                    int distance = (int)Math.sqrt((e.getX()-firstProjectionPoint.getX()*zoomScale)*(e.getX()-firstProjectionPoint.getX()*zoomScale)+(e.getY()-firstProjectionPoint.getY()*zoomScale)*(e.getY()-firstProjectionPoint.getY()*zoomScale));
                     if(distance < 10){
                         projectionPointMoving = ProjectionPointMoving.FIRST;
+                        System.out.println(firstProjectionPoint.getX()*zoomScale + " " + firstProjectionPoint.getY()*zoomScale + " vs " + e.getX() + " " + e.getY());
                     }
                 }
                 if(secondProjectionPoint != null){
-                    int distance = (int)Math.sqrt((e.getX()-secondProjectionPoint.getX())*(e.getX()-secondProjectionPoint.getX())+(e.getY()-secondProjectionPoint.getY())*(e.getY()-secondProjectionPoint.getY()));
+                    int distance = (int)Math.sqrt((e.getX()-secondProjectionPoint.getX()*zoomScale)*(e.getX()-secondProjectionPoint.getX()*zoomScale)+(e.getY()-secondProjectionPoint.getY()*zoomScale)*(e.getY()-secondProjectionPoint.getY()*zoomScale));
                     if(distance < 10){
                         projectionPointMoving = ProjectionPointMoving.SECOND;
                     }

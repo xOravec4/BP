@@ -560,15 +560,18 @@ public class Dialogs {
                 
                 List<ObjectFeature> result1 = null;
                 List<ObjectFeature> result2 = null;
+                float similatity = 0;
                 if(algorithm == 1){
                     NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( projection1.getSortedProjection(first),  projection2.getSortedProjection(second)); 
                     result1 = needlemanWunsch.getFirstSequence();
                     result2 = needlemanWunsch.getSecondSequence();
+                    similatity = needlemanWunsch.getSimilarity();
                 }
                 else if(algorithm == 2){
                     SmithWaterman smithWaterman = new SmithWaterman( projection1.getSortedProjection(first),  projection2.getSortedProjection(second)); 
                     result1 = smithWaterman.getFirstSequence();
                     result2 = smithWaterman.getSecondSequence();
+                    similatity = smithWaterman.getSimilarity();
                 
                 }
                  
@@ -583,6 +586,8 @@ public class Dialogs {
                 frame.getSecondScrollPane().SetBottomProjectionPanelVisible();
                 frame.getFirstScrollPane().SetSideProjectionPanelInvisible();
                 frame.getSecondScrollPane().SetSideProjectionPanelInvisible();
+                
+                frame.SetNWSWTotalSimilarity(similatity);
                 dialog.dispose();
             }
         });

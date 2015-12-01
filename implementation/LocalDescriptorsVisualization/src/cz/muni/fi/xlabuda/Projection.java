@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -105,10 +106,10 @@ public class Projection  {
                     result.put(objectFeature, nearestPointOnLine(A.getX(), A.getY(),
                             B.getX(), B.getY(),
                             objectFeature.getX()* imageWidth, objectFeature.getY() * imageHeigt));
-                    System.out.println(nearestPointOnLine(A.getX(), A.getY(),
+                    /*System.out.println(nearestPointOnLine(A.getX(), A.getY(),
                             B.getX(), B.getY(),
                             objectFeature.getX() * imageWidth, objectFeature.getY() * imageHeigt));
-                    
+                    */
                 } 
                 return result;
            default:
@@ -129,6 +130,7 @@ public class Projection  {
     return sortedByValues;
 }
     
+    
     public List<ObjectFeature> getSortedProjection(Set<ObjectFeature> objFeatureList){
         
         Map<ObjectFeature, Float> result = getProjection(objFeatureList);
@@ -136,26 +138,49 @@ public class Projection  {
         List<ObjectFeature> keys = new ArrayList<ObjectFeature>();
         List<Float> values = new ArrayList<Float>();
         
-        for (Map.Entry<ObjectFeature, Float> entry : result.entrySet()) {
+        ValueComparator bvc = new ValueComparator();
+        Map<ObjectFeature, Float> sorted = new TreeMap(bvc);
+        sorted.putAll(result);
+        
+        for (Map.Entry<ObjectFeature, Float> entry : sorted.entrySet()) {
         
             if(keys.size() == 0){
                 keys.add(entry.getKey());
                 values.add(entry.getValue());
-                System.out.println("a");
+                //System.out.println("a");
                 continue;
             }
             
             for(int i=0;i<keys.size();i++){
-                if( entry.getValue() >= values.get(i)){
-                    keys.add(i+1, entry.getKey());
-                    values.add(i+1, entry.getValue());
-                    System.out.println("b");
+                
+                if( entry.getValue() == values.get(i)){
+                    System.out.println("ERRORRRRRRRRRRRRRRRRR");
+                    //    10 20 30 40 50
+                }
+                
+                //if( entry.getValue() <= values.get(i)){
+                if( entry.getValue() < values.get(i)){
+                    keys.add(i, entry.getKey());
+                    values.add(i, entry.getValue());
+                    //System.out.println("b");
                     break;
+                }
+                
+                if( entry.getValue() == values.get(i)){
+                    if(entry.getKey().getY() > keys.get(i).getY()){
+                    keys.add(i, entry.getKey());
+                    values.add(i, entry.getValue());    
+                    }
+                    else{
+                        keys.add(i+1, entry.getKey());
+                        values.add(i+1, entry.getValue()); 
+                    }
+                    
                 }
                 if(i==keys.size()-1){
                     keys.add( entry.getKey());
                     values.add( entry.getValue());
-                    System.out.println("c");
+                    //System.out.println("c");
                     break;
                 }
                 
@@ -164,12 +189,15 @@ public class Projection  {
             
             
         }
+        /*
         System.out.println("STARt");
         for(int i=0;i<values.size();i++){
+
             System.out.println(values.get(i));
         }
-        System.out.println("STOP");
-        return keys;
+        System.out.println("STOP");*/
+        return new ArrayList<ObjectFeature>(sorted.keySet());
+        //return keys;
         
         
 
@@ -221,10 +249,10 @@ public class Projection  {
                 }
                 dest.setLocation(ax + abx * t, ay + aby * t);
                 
-                System.out.println("Input :" + ax + " " + ay + "  XX " + bx + " " + by+ "  XX " + px + " " + py);
+                //System.out.println("Input :" + ax + " " + ay + "  XX " + bx + " " + by+ "  XX " + px + " " + py);
                 
                 float result = (float) Math.sqrt(Math.pow((ax - dest.getX()), 2) + Math.pow((ay - dest.getY()), 2)) / (float) Math.sqrt(Math.pow((ax - bx), 2) + Math.pow((ay - by), 2));
-                System.out.println("Result  : " +  dest.getX() + " " + dest.getY() + "  vzdialenost: "+ result);
+                //System.out.println("Result  : " +  dest.getX() + " " + dest.getY() + "  vzdialenost: "+ result);
                // System.out.println(ax+" " + ay +" " + bx+" " + by +" " + px+" " + py +" RESULT:"+dest.getX()   );
                // return (float)dest.getX();
                 return (float) Math.sqrt(Math.pow((ax - dest.getX()), 2) + Math.pow((ay - dest.getY()), 2)) / (float) Math.sqrt(Math.pow((ax - bx), 2) + Math.pow((ay - by), 2));
@@ -270,6 +298,28 @@ public class Projection  {
     public ProjectionTo getProjectionType(){
         return projectionTo;
     }
+    
+    
 
     
+}
+
+class ValueComparator implements Comparator {
+
+
+    @Override public int compare(Object a1, Object b2) {
+
+        ObjectFeature a = (ObjectFeature)a1;
+        ObjectFeature b = (ObjectFeature)b2;
+        if ( a.getX() > b.getX()) {
+            return 1;
+        } else if (a.getX() == b.getX()){
+            if(a.getY() > b.getY()){
+               return 1; 
+            }
+            return -1;
+        }
+        return -1;
+    }
+
 }

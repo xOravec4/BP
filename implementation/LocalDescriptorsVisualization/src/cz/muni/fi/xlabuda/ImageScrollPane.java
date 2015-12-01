@@ -75,6 +75,8 @@ public class ImageScrollPane extends JPanel {
     private JButton sizeButton;
     private JButton defaultButton;
     
+    private JButton toggleProjectionButton;
+    
     private ProjectionPanel bottomProjectionPanel;
     private ProjectionPanel sideProjectionPanel;
     private JButton switchProjectionsPanels;
@@ -190,13 +192,29 @@ public class ImageScrollPane extends JPanel {
         fitToWidthButton = new JButton(newFitToWidthIcon);
         fitToHeightButton = new JButton(newFitToHeightIcon);
         fitToScreenButton = new JButton(newFitToScreenIcon);
-
+        
+        toggleProjectionButton = new JButton(newImageIcon);
+                
         undoButton = new JButton(newUndoIcon);
         redoButton = new JButton(newRedoIcon);
         colorButton = new JButton(newColorIcon);
         sizeButton = new JButton(newSizeIcon);
         scaleFilterButton = new JButton(newSizeFilterIcon);
         defaultButton = new JButton(newDefaultIcon);
+        
+        
+                
+        toggleProjectionButton.setToolTipText("Toggle Projection");
+        toggleProjectionButton.setFocusTraversalKeysEnabled(false);
+        toggleProjectionButton.setFocusPainted(false);
+        toggleProjectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+               System.out.println("toggleProjectionButton");
+               ToggleProjectionPanels();
+            }
+        });
+        
+        toggleProjectionButton.setEnabled(false);
 
         openImageButton.setToolTipText(localLanguage.getString("open_image_button"));
         openImageButton.setFocusTraversalKeysEnabled(false);
@@ -380,6 +398,7 @@ public class ImageScrollPane extends JPanel {
         upperButtonPanel.add(fitToScreenButton);
         upperButtonPanel.add(fitToWidthButton);
         upperButtonPanel.add(fitToHeightButton);
+        upperButtonPanel.add(toggleProjectionButton);
 
         bottomButtonPanel.add(undoButton);
         bottomButtonPanel.add(redoButton);
@@ -962,6 +981,21 @@ public class ImageScrollPane extends JPanel {
         bottomProjectionPanel.setVisible(false);
         sideProjectionPanel.setVisible(false);
         getImagePanel().getDescriptors().cancelProjection();
+    }
+    
+    public void ToggleProjectionPanels(){
+        if(bottomProjectionPanel.isVisible() && !sideProjectionPanel.isVisible()){
+            bottomProjectionPanel.setVisible(false);
+            sideProjectionPanel.setVisible(true);
+        }
+        else if(!bottomProjectionPanel.isVisible() && sideProjectionPanel.isVisible()){
+            bottomProjectionPanel.setVisible(true);
+            sideProjectionPanel.setVisible(false);
+        }
+    }
+    
+    public void EnableProjectionPanelsToggling(boolean bool){
+        toggleProjectionButton.setEnabled(bool);
     }
 
     

@@ -131,6 +131,8 @@ public class MainFrame extends JFrame {
     private JMenuItem projectionSecondImageCustom;
     private JMenuItem projectionTogglePositionFirstImage;
     private JMenuItem projectionTogglePositionSecondImage;
+    private JMenuItem projectionResetFirstImage;
+    private JMenuItem projectionResetSecondImage;
     
     private JMenuItem needlemanWunschButton;
     private JMenuItem smithWatermanButton;
@@ -200,6 +202,7 @@ public class MainFrame extends JFrame {
 
     private JPanel mainPanel;
     private JPanel comparativePanel;
+    private JPanel comparativePanelNWSW;
     // nested panel
     private JPanel glasspaneButtonPanel;
 
@@ -209,6 +212,8 @@ public class MainFrame extends JFrame {
     private JButton tresholdButton;
     private JLabel similarDescriptorsTotalCountLabel;
     private JLabel similarDescriptorsVisibleCountLabel;
+    private JLabel NWSWTotalDescriptorsSimiliraty;
+    private JLabel NWSWCurrentDescriptorSimiliraty;
 
     private ImagePanel imagePanel;
     private ImageScrollPane imageScrollPane;
@@ -286,6 +291,8 @@ public class MainFrame extends JFrame {
         projectionSecondImageCustom = new JRadioButtonMenuItem();
         projectionTogglePositionFirstImage = new JMenuItem();
         projectionTogglePositionSecondImage = new JMenuItem();
+        projectionResetFirstImage = new JMenuItem();
+        projectionResetSecondImage  = new JMenuItem();      
         
         needlemanWunschButton = new JMenuItem();
         smithWatermanButton = new JMenuItem();
@@ -353,6 +360,7 @@ public class MainFrame extends JFrame {
 
         mainPanel = new JPanel();
         comparativePanel = new JPanel();
+        comparativePanelNWSW = new JPanel(); 
         glasspaneButtonPanel = new JPanel();
 
         imagePanel = new ImagePanel();
@@ -368,7 +376,9 @@ public class MainFrame extends JFrame {
         tresholdButton = new JButton();
         similarDescriptorsTotalCountLabel = new JLabel();
         similarDescriptorsVisibleCountLabel = new JLabel();
-
+        NWSWCurrentDescriptorSimiliraty = new JLabel();
+        NWSWTotalDescriptorsSimiliraty = new JLabel();
+        
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
         getContentPane().setLayout(new BorderLayout());
@@ -720,19 +730,36 @@ public class MainFrame extends JFrame {
             }
         });
         
-
+        projectionResetFirstImage.setText("Reset");
+        projectionResetFirstImage.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+                resetProjection(imageScrollPane);
+                revalidate();
+            }
+        });
+        projectionResetSecondImage.setText("Reset");
+        projectionResetSecondImage.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+                resetProjection(secondImageScrollPane);
+                revalidate();
+            }
+        });
         
         projectionFirstImageToX.setText("To X");
         projectionFirstImageToX.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
                 resetProjection(imageScrollPane);
-                imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.X);
                 
+                imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.X);
+                projectionResetFirstImage.setEnabled(true);
+                imageScrollPane.EnableProjectionPanelsToggling(true);
+
                 setProjectionGlassPane();
                
                 if(!imageScrollPane.isProjectionVisible()){
                     imageScrollPane.SetBottomProjectionPanelVisible();
                 }
+                projectionFirstImageToX.setSelected(true);
                 projectionFirstImageToY.setSelected(false);
                 projectionFirstImageCustom.setSelected(false);
                 revalidate();
@@ -744,12 +771,16 @@ public class MainFrame extends JFrame {
         public void actionPerformed(ActionEvent event) {
                 resetProjection(secondImageScrollPane);
                 secondImageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.X);  
-                
+
+                projectionResetSecondImage.setEnabled(true);
+                secondImageScrollPane.EnableProjectionPanelsToggling(true);
                 setProjectionGlassPane();
                 
                 if(!secondImageScrollPane.isProjectionVisible()){
                     secondImageScrollPane.SetBottomProjectionPanelVisible();
                 }
+                
+                projectionSecondImageToX.setSelected(true);
                 projectionSecondImageToY.setSelected(false);
                 projectionSecondImageCustom.setSelected(false);
                 revalidate();
@@ -761,13 +792,16 @@ public class MainFrame extends JFrame {
         public void actionPerformed(ActionEvent event) { 
                 resetProjection(imageScrollPane);
                 imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.Y); 
-                
+                projectionResetFirstImage.setEnabled(true);
+                imageScrollPane.EnableProjectionPanelsToggling(true);
+
                 setProjectionGlassPane();
                 
                 if(!imageScrollPane.isProjectionVisible()){
                     imageScrollPane.SetBottomProjectionPanelVisible();
                 }
                 projectionFirstImageToX.setSelected(false);
+                projectionFirstImageToY.setSelected(true);
                 projectionFirstImageCustom.setSelected(false);
                 revalidate();
             }
@@ -778,13 +812,16 @@ public class MainFrame extends JFrame {
         public void actionPerformed(ActionEvent event) {   
                 resetProjection(secondImageScrollPane);
                 secondImageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.Y);               
-                
+
+                projectionResetSecondImage.setEnabled(true);
+                secondImageScrollPane.EnableProjectionPanelsToggling(true);
                 setProjectionGlassPane();
                 
                 if(!secondImageScrollPane.isProjectionVisible()){
                     secondImageScrollPane.SetBottomProjectionPanelVisible();
                 }
                 projectionSecondImageToX.setSelected(false);
+                projectionSecondImageToY.setSelected(true);
                 projectionSecondImageCustom.setSelected(false);
                 revalidate();
             }
@@ -794,6 +831,8 @@ public class MainFrame extends JFrame {
         projectionFirstImageCustom.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {                   
                 resetProjection(imageScrollPane);
+                projectionResetFirstImage.setEnabled(true);
+                imageScrollPane.EnableProjectionPanelsToggling(true);
                 
                 imageScrollPane.getImagePanel().showProjectionPoints();
                 
@@ -808,6 +847,7 @@ public class MainFrame extends JFrame {
                 
                 projectionFirstImageToX.setSelected(false);
                 projectionFirstImageToY.setSelected(false);
+                projectionFirstImageCustom.setSelected(true);
 
             revalidate();
             }
@@ -817,8 +857,9 @@ public class MainFrame extends JFrame {
         projectionSecondImageCustom.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {                   
                 resetProjection(secondImageScrollPane);
-                
+                projectionResetSecondImage.setEnabled(true);
                 secondImageScrollPane.getImagePanel().showProjectionPoints();
+                secondImageScrollPane.EnableProjectionPanelsToggling(true);
                 
                 setProjectionGlassPane();
                 Point2D a = secondImageScrollPane.getImagePanel().getFirstProjectionPoint();
@@ -831,6 +872,7 @@ public class MainFrame extends JFrame {
                 
                 projectionSecondImageToX.setSelected(false);
                 projectionSecondImageToY.setSelected(false);
+                projectionSecondImageCustom.setSelected(true);
 
             revalidate();
             }
@@ -868,9 +910,7 @@ public class MainFrame extends JFrame {
         test.setText("test");
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                System.out.println("asdsasd");
-                Dialogs.ProjectionSelection(thisInstance,1);
-              //  imageScrollPane.
+                getContentPane().add(comparativePanelNWSW, BorderLayout.NORTH);
             }
         });
 
@@ -1018,6 +1058,10 @@ public class MainFrame extends JFrame {
         glasspaneButtonPanel.add(antialiasButton);
         glasspaneButtonPanel.add(tresholdButton);
         glasspaneButtonPanel.add(hideGlasspaneButton);
+        
+        comparativePanelNWSW.add(NWSWTotalDescriptorsSimiliraty);
+        comparativePanelNWSW.add(hideGlasspaneButton);
+        comparativePanelNWSW.add(NWSWCurrentDescriptorSimiliraty);
 
         comparativePanel.add(similarDescriptorsTotalCountLabel);
         comparativePanel.add(glasspaneButtonPanel);
@@ -1120,6 +1164,8 @@ public class MainFrame extends JFrame {
         projectionFirstImage.add(new JSeparator());
         projectionFirstImage.add(projectionTogglePositionFirstImage);
         projectionFirstImage.setEnabled(false);
+        projectionFirstImage.add(projectionResetFirstImage);
+        projectionResetFirstImage.setEnabled(false);
         
         projectionSecondImage.add(projectionSecondImageToX);
         projectionSecondImage.add(projectionSecondImageToY);
@@ -1127,6 +1173,8 @@ public class MainFrame extends JFrame {
         projectionSecondImage.add(new JSeparator());
         projectionSecondImage.add(projectionTogglePositionSecondImage);
         projectionSecondImage.setEnabled(false);
+        projectionSecondImage.add(projectionResetSecondImage);
+        projectionResetSecondImage.setEnabled(false);
        
         ////projectionMenu.add(needlemanWunschButton);
         
@@ -1492,13 +1540,6 @@ public class MainFrame extends JFrame {
         return oneImageMode;
     }
     
-    public void setComparationMode(boolean turnedOn, boolean resetProjections) {
-        if(resetProjections){
-            imageScrollPane.resetProjection();
-            secondImageScrollPane.resetProjection();
-        }
-        setComparationMode(turnedOn);
-    }
     
 
     public void setComparationMode(boolean turnedOn) {
@@ -1508,7 +1549,18 @@ public class MainFrame extends JFrame {
         
         if(visualisationType == VisualisationType.NEEDLEMANWUNSCH ||
                 visualisationType == VisualisationType.SMITHWATERMAN){
+            
+                if(turnedOn){
+                    getContentPane().add(comparativePanelNWSW, BorderLayout.NORTH);
+                    NWSWTotalDescriptorsSimiliraty.setText("Total similarity: NONE");
+                    NWSWCurrentDescriptorSimiliraty.setText("Current two descriptors similarity: NONE");
+                }
+                else{
+                    getContentPane().remove(comparativePanelNWSW);
+                }
                 
+                imageScrollPane.EnableProjectionPanelsToggling(turnedOn);
+                secondImageScrollPane.EnableProjectionPanelsToggling(turnedOn);
                 hideSimilarDescriptors.setEnabled(turnedOn);
                 setTresholdItem.setEnabled(false);
                 setLinesColorItem.setEnabled(false);
@@ -1521,6 +1573,7 @@ public class MainFrame extends JFrame {
                 
                 projectionFirstImage.setEnabled(!turnedOn);
                 projectionSecondImage.setEnabled(!turnedOn);
+                
                 
                 
                 if(!turnedOn){
@@ -1673,18 +1726,26 @@ public class MainFrame extends JFrame {
             isp.getImagePanel().HideCustomProjectionPoints();
             
         }
+        
+        isp.EnableProjectionPanelsToggling(false);
+        
+        
         isp.getImagePanel().getDescriptors().cancelProjection();
         isp.hideProjectionPanels();
         if(isp == imageScrollPane){
             projectionFirstImageToX.setSelected(false);
             projectionFirstImageToY.setSelected(false);
             projectionFirstImageCustom.setSelected(false);
+            projectionResetFirstImage.setEnabled(false);
         }
         if(isp == secondImageScrollPane){
             projectionSecondImageToX.setSelected(false);
             projectionSecondImageToY.setSelected(false);
             projectionSecondImageCustom.setSelected(false);
+            projectionResetSecondImage.setEnabled(false);
         }
+        
+                
         
     }
     
@@ -1719,6 +1780,30 @@ public class MainFrame extends JFrame {
         this.visualisationType = VisualisationType.SMITHWATERMAN;
     }
     
+    public ImageScrollPane getOtherISP(ImageScrollPane isp){
+        if(isp == imageScrollPane)
+            return secondImageScrollPane;
+        else
+            return imageScrollPane;
+    }
+   
+    public void SetNWSWTotalSimilarity(float a){
+        NWSWTotalDescriptorsSimiliraty.setText("Total similarity: " + Float.toString(a));
+    }
+    
+    public void SetNWSWCurrentSimilarity(Float a){
+        if(a != null)
+            NWSWCurrentDescriptorSimiliraty.setText("Current two descriptors similarity: " +Float.toString(a));
+        else
+            NWSWCurrentDescriptorSimiliraty.setText("Current two descriptors similarity: NONE");
+    }
+    
+    public int getComparativePanelNWSWHeight(){
+        if(comparativePanelNWSW.isVisible())
+            return comparativePanelNWSW.getHeight();
+        else
+            return 0;
+    }
     
     
 }

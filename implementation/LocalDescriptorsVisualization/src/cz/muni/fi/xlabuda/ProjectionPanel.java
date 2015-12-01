@@ -151,6 +151,13 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                 float step = (float) this.getWidth() / (float) dataList.size();
                 for (int i = 0; i < dataList.size(); i++) {
                     if (dataList.get(i) != null) {
+                        ImageScrollPane otherISP = getParentImageScrollPane().getParentMainFrame().getOtherISP(getParentImageScrollPane());
+                        if(otherISP.getBottomProjectionPanel().descriptorExistsAt(i)){
+                            g.setColor(Color.green);
+                        }
+                        else{
+                            g.setColor(Color.red);
+                        }
                         g.fillRect((int) ((float) i * step), 1, pointSize, pointSize);
                         // System.out.println("Debug: "+ step +" "+ this.getWidth() +" "+ dataList.size());
                     }else{
@@ -198,6 +205,10 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
         ProjectionGlassPane pane =  (ProjectionGlassPane) getParentImageScrollPane().getParentMainFrame().getGlassPane();
         return pane;
     }
+    
+    public MainFrame getMainFrame() {
+        return getParentImageScrollPane().getParentMainFrame();
+    }
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -226,6 +237,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                 for(int i=0; i< dataListSize;i++){
                     float a =  ((float) i * step);
                     if (  e.getX() >= a && e.getX() <= a + pointSize) {
+                      
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
                       getProjectionGlassPane().set(dataList.get(i), a, i, getParentImageScrollPane().getImagePanel().getImage());
                       return;
@@ -352,6 +364,12 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
         dataMap = null;
         revalidate();
         repaint();
+    }
+    
+    public boolean descriptorExistsAt(int i){
+        if(dataList.get(i) == null)
+            return false;
+        return true;
     }
     
 
