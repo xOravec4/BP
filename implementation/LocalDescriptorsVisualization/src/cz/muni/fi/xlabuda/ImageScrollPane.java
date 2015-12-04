@@ -980,7 +980,8 @@ public class ImageScrollPane extends JPanel {
     public void resetProjection(){
         bottomProjectionPanel.setVisible(false);
         sideProjectionPanel.setVisible(false);
-        getImagePanel().getDescriptors().cancelProjection();
+        if(getImagePanel().getDescriptors() != null)
+            getImagePanel().getDescriptors().cancelProjection();
     }
     
     public void ToggleProjectionPanels(){

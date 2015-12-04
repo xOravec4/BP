@@ -65,21 +65,28 @@ public class NeedlemanWunsch {
             }
         }
                 */
-        /*
+        
         for(int i=0;i<list1.size()-1;i++){
-
+            if(true)break;
             if(list1.get(i).getX() == list1.get(i+1).getX()){
                 System.out.println("ERRROOOOOOOOOOOR THE SAME " + list1.get(i).getX() + " " + list1.get(i+1).getX());
                 System.out.println(list1.get(i));
-                System.out.println();
+                
                 System.out.println(list2.get(i));
-            
+                System.out.println();
+                System.out.println();
             }
             else{
                 System.out.println("ok, dif");
+                System.out.println( list1.get(i).getX() + " " + list1.get(i+1).getX());
+                System.out.println(list1.get(i));
+                
+                System.out.println(list2.get(i));
+                System.out.println();
+                System.out.println();
             }
 
-        }*/
+        }
         System.out.println("PRINT TWO INPUT LISTS END");
         
         

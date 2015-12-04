@@ -222,7 +222,9 @@ public class MainFrame extends JFrame {
     private ImageScrollPane secondImageScrollPane;
     
     private ProjectionGlassPane projectionGlassPane;
-
+    
+    private Projection visualizationProjectionFirstImage = null;
+    private Projection visualizationProjectionSecondImage = null;
 
     /**
      * Create new instance of MainFrame and initialize the components for the frame
@@ -726,7 +728,71 @@ public class MainFrame extends JFrame {
         needlemanWunschButton.setText("NeedlemanWunsch");
         needlemanWunschButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-                Dialogs.ProjectionSelection(thisInstance, VisualisationType.NEEDLEMANWUNSCH.ordinal());
+                //Dialogs.ProjectionSelection(thisInstance, VisualisationType.NEEDLEMANWUNSCH.ordinal());
+                if(bothProjectionsSet()){
+                    setProjectionGlassPane();
+                    setVisualisationType(1);
+                    
+                    Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    
+                    imageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
+                    secondImageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
+                    
+                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second)); 
+                    List<ObjectFeature> result1 = null;
+                    List<ObjectFeature> result2 = null;
+                    result1 = needlemanWunsch.getFirstSequence();
+                    result2 = needlemanWunsch.getSecondSequence();
+                    
+                    setComparationMode(true);
+                    imageScrollPane.getBottomProjectionPanel().setData(result1);
+                    imageScrollPane.getSideProjectionPanel().setData(result1);
+                    secondImageScrollPane.getBottomProjectionPanel().setData(result2);
+                    secondImageScrollPane.getSideProjectionPanel().setData(result2);
+
+                    imageScrollPane.SetBottomProjectionPanelVisible();
+                    secondImageScrollPane.SetBottomProjectionPanelVisible();
+                    imageScrollPane.SetSideProjectionPanelInvisible();
+                    secondImageScrollPane.SetSideProjectionPanelInvisible();
+
+                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());
+                    
+                }
+                if(bothProjectionsSet() && false){
+
+                    Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    setProjectionGlassPane();
+                    setVisualisationType(1);
+                    
+                    visualizationProjectionFirstImage = imageScrollPane.getImagePanel().getDescriptors().getProjection();
+                    visualizationProjectionSecondImage = secondImageScrollPane.getImagePanel().getDescriptors().getProjection();
+                    
+                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( visualizationProjectionFirstImage.getSortedProjection(first),  visualizationProjectionSecondImage.getSortedProjection(second)); 
+                    List<ObjectFeature> result1 = null;
+                    List<ObjectFeature> result2 = null;
+                    result1 = needlemanWunsch.getFirstSequence();
+                    result2 = needlemanWunsch.getSecondSequence();
+
+                    setComparationMode(true);
+                    imageScrollPane.getBottomProjectionPanel().setData(result1);
+                    imageScrollPane.getSideProjectionPanel().setData(result1);
+                    secondImageScrollPane.getBottomProjectionPanel().setData(result2);
+                    secondImageScrollPane.getSideProjectionPanel().setData(result2);
+
+                    imageScrollPane.SetBottomProjectionPanelVisible();
+                    secondImageScrollPane.SetBottomProjectionPanelVisible();
+                    imageScrollPane.SetSideProjectionPanelInvisible();
+                    secondImageScrollPane.SetSideProjectionPanelInvisible();
+
+                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());
+                }
+                else{
+                    
+                }
+            
+            
             }
         });
         
@@ -910,7 +976,9 @@ public class MainFrame extends JFrame {
         test.setText("test");
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                getContentPane().add(comparativePanelNWSW, BorderLayout.NORTH);
+                //getContentPane().add(comparativePanelNWSW, BorderLayout.NORTH);
+                Projection hersd = new Projection(ProjectionTo.X);
+                hersd.getSortedProjection(imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors());
             }
         });
 
@@ -1544,8 +1612,9 @@ public class MainFrame extends JFrame {
 
     public void setComparationMode(boolean turnedOn) {
         
-        imageScrollPane.resetProjection();
-        secondImageScrollPane.resetProjection();
+
+        
+
         
         if(visualisationType == VisualisationType.NEEDLEMANWUNSCH ||
                 visualisationType == VisualisationType.SMITHWATERMAN){
@@ -1582,16 +1651,31 @@ public class MainFrame extends JFrame {
                     secondImageScrollPane.getBottomProjectionPanel().clear();
                     secondImageScrollPane.getSideProjectionPanel().clear();
                     
-                    getGlassPane().setEnabled(false);
-                    getGlassPane().setVisible(false);
                     
+                    projectionResetFirstImage.setEnabled(true);
+                    projectionResetFirstImage.setEnabled(true);
+                    imageScrollPane.EnableProjectionPanelsToggling(true);
+                    secondImageScrollPane.EnableProjectionPanelsToggling(true);
+
+                    setProjectionGlassPane();
+                    imageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(false);
+                    secondImageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(false);
                     
+
+                    revalidate();
+                    
+                    //getGlassPane().setEnabled(false);
+                    //getGlassPane().setVisible(false);
+            
                 } 
                 
                 
                 
                 return;
         }
+        
+        imageScrollPane.resetProjection();
+        secondImageScrollPane.resetProjection();
         
         
         if (!turnedOn) {
@@ -1803,6 +1887,32 @@ public class MainFrame extends JFrame {
             return comparativePanelNWSW.getHeight();
         else
             return 0;
+    }
+    
+    public void RefreshVisualization(){
+                    Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    
+
+                    
+                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second)); 
+                    List<ObjectFeature> result1 = null;
+                    List<ObjectFeature> result2 = null;
+                    result1 = needlemanWunsch.getFirstSequence();
+                    result2 = needlemanWunsch.getSecondSequence();
+                    
+
+                    imageScrollPane.getBottomProjectionPanel().setData(result1);
+                    imageScrollPane.getSideProjectionPanel().setData(result1);
+                    secondImageScrollPane.getBottomProjectionPanel().setData(result2);
+                    secondImageScrollPane.getSideProjectionPanel().setData(result2);
+
+                    imageScrollPane.SetBottomProjectionPanelVisible();
+                    secondImageScrollPane.SetBottomProjectionPanelVisible();
+                    imageScrollPane.SetSideProjectionPanelInvisible();
+                    secondImageScrollPane.SetSideProjectionPanelInvisible();
+
+                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());
     }
     
     

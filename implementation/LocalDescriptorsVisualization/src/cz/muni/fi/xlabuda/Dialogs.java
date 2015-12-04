@@ -555,8 +555,6 @@ public class Dialogs {
                 
                 
                 frame.setProjectionGlassPane();
-                List<ObjectFeature> a1 = projection1.getSortedProjection(first);
-                List<ObjectFeature> a2 = projection2.getSortedProjection(first);
                 
                 List<ObjectFeature> result1 = null;
                 List<ObjectFeature> result2 = null;

@@ -115,6 +115,8 @@ public abstract class LocalDescriptors {
     private int ProjectionPointBx = 5000;
     private int ProjectionPointBy = 5000;
     
+    boolean visualizationMode = false;
+    
 
     public LocalDescriptors() {        
         visibleDescriptors = new HashSet<ObjectFeature>();
@@ -524,8 +526,13 @@ public abstract class LocalDescriptors {
             draw(graphics, iterator.next());
         }
         
-        if(projection != null){
+        if(projection != null && !visualizationMode){
             checkProjection();
+        }
+        if(visualizationMode){
+            
+            
+            getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
         }
         
         
@@ -928,6 +935,11 @@ public abstract class LocalDescriptors {
         projection = new Projection(projectionTo);
     }
     
+    public void setProjection(Projection projection){
+        System.out.println("Setting projection");
+        this.projection = projection;
+    }
+    
     public void setProjection(ProjectionTo projectionTo, Point2D a, Point2D b){
         System.out.println("Setting projection");
         projection = new Projection(projectionTo, a, b);
@@ -975,5 +987,9 @@ public abstract class LocalDescriptors {
     
     public Projection getProjection(){
         return projection; 
+    }
+    
+    public void setVisualizationMode(boolean bool){
+        visualizationMode = bool;
     }
 }

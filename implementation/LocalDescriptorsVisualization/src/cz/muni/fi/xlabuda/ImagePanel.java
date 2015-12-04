@@ -639,6 +639,11 @@ public final class ImagePanel extends JPanel {
         firstProjectionPoint = new Point2D.Double(width/3, height/2);
         secondProjectionPoint = new Point2D.Double((width/3) * 2, height/2);
     }
+    
+    public void showProjectionPoints(Point2D a, Point2D b){
+        firstProjectionPoint = a;
+        secondProjectionPoint = b;
+    }
  
     
 }

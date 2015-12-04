@@ -97,12 +97,14 @@ public class Projection  {
      public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList, int imageWidth, int imageHeigt, Point2D A, Point2D B)
     {
         Map<ObjectFeature, Float> result = new HashMap<ObjectFeature, Float>();
-        
+        custonProjectionFirstPoint = A;
+        custonProjectionSecondPoint = B;
         switch (projectionTo)
         {
            case CUSTOM:
                 for(ObjectFeature objectFeature : objFeatureList)
                 {
+                    if(inRange(A.getX(), A.getY(),B.getX(), B.getY(),objectFeature.getX()* imageWidth, objectFeature.getY() * imageHeigt))
                     result.put(objectFeature, nearestPointOnLine(A.getX(), A.getY(),
                             B.getX(), B.getY(),
                             objectFeature.getX()* imageWidth, objectFeature.getY() * imageHeigt));
@@ -138,34 +140,60 @@ public class Projection  {
         List<ObjectFeature> keys = new ArrayList<ObjectFeature>();
         List<Float> values = new ArrayList<Float>();
         
-        ValueComparator bvc = new ValueComparator();
-        Map<ObjectFeature, Float> sorted = new TreeMap(bvc);
-        sorted.putAll(result);
+        //ValueComparator bvc = new ValueComparator();
+        //Map<ObjectFeature, Float> sorted = new TreeMap(bvc);
+        //sorted.putAll(result);
         
-        for (Map.Entry<ObjectFeature, Float> entry : sorted.entrySet()) {
+        for (Map.Entry<ObjectFeature, Float> entry : result.entrySet()) {
         
             if(keys.size() == 0){
                 keys.add(entry.getKey());
                 values.add(entry.getValue());
-                //System.out.println("a");
+                //System.out.println("ALFA");
                 continue;
             }
             
             for(int i=0;i<keys.size();i++){
+                //System.out.println("JUST TEST " + entry.getValue() + " vs " + values.get(i));
+                if( Math.abs(entry.getValue()- values.get(i)) < 0.00000001){
+                    System.out.println("ERRORRRRRRRRRRRRRRRRR they are same");
+                    System.out.println(entry.getKey());
+                    System.out.println(keys.get(i));
+                    System.out.println("entry.getKey()   " + entry.getKey().getX() +"  +  " +entry.getKey().getY() );
+                    System.out.println("keys.get(i)   " + keys.get(i).getX() +"  <  " +keys.get(i).getY() );
+                    System.out.println("ORIENTATION  " + entry.getKey().getOrientation() + " " + keys.get(i).getOrientation());
+                    System.out.println("");
+                    
+                    
+                    if(Math.abs(  (entry.getKey().getOrientation() -  keys.get(i).getOrientation() ) )< 0.00001){
+                        
+                    }
+                    else{
+                    
+                        if(entry.getKey().getOrientation() <  keys.get(i).getOrientation()){
+                        keys.add(i, entry.getKey());
+                        values.add(i, entry.getValue()); 
+                        break;   
+                        }
+                        continue;
+                    }
+                    
+                    
+                    
+                    
                 
-                if( entry.getValue() == values.get(i)){
-                    System.out.println("ERRORRRRRRRRRRRRRRRRR");
                     //    10 20 30 40 50
                 }
                 
                 //if( entry.getValue() <= values.get(i)){
-                if( entry.getValue() < values.get(i)){
+                if( entry.getValue() <  values.get(i)){
+                    //System.out.println("BETA " + entry.getValue() + " < " + values.get(i));
                     keys.add(i, entry.getKey());
                     values.add(i, entry.getValue());
-                    //System.out.println("b");
+                    
                     break;
                 }
-                
+                /*
                 if( entry.getValue() == values.get(i)){
                     if(entry.getKey().getY() > keys.get(i).getY()){
                     keys.add(i, entry.getKey());
@@ -176,19 +204,37 @@ public class Projection  {
                         values.add(i+1, entry.getValue()); 
                     }
                     
-                }
+                }*/
                 if(i==keys.size()-1){
                     keys.add( entry.getKey());
                     values.add( entry.getValue());
-                    //System.out.println("c");
+                    //System.out.println("GAMA");
                     break;
                 }
                 
             }   
             
             
+  
+            
+            
             
         }
+        
+                  System.out.println("FINAL");
+            System.out.println("");
+            System.out.println("");
+            System.out.println("");
+            for(int i=0;i<keys.size()-1;i++){
+                if(Math.abs(values.get(i+1)- values.get(i)) < 0.000001){
+                System.out.println(values.get(i) +  "        !!!!!!!!!!!!!!!!!!!!");    
+                    
+                }
+                else
+                System.out.println(values.get(i));
+                //System.out.println(keys.get(i));
+                //System.out.println();
+            }
         /*
         System.out.println("STARt");
         for(int i=0;i<values.size();i++){
@@ -196,8 +242,8 @@ public class Projection  {
             System.out.println(values.get(i));
         }
         System.out.println("STOP");*/
-        return new ArrayList<ObjectFeature>(sorted.keySet());
-        //return keys;
+        //return new ArrayList<ObjectFeature>(sorted.keySet());
+        return keys;
         
         
 
@@ -299,6 +345,22 @@ public class Projection  {
         return projectionTo;
     }
     
+    public Point2D getFirstCustomProjectionPoint(){
+        return custonProjectionFirstPoint;
+    }
+    
+    public Point2D getSecondCustomProjectionPoint(){
+        return custonProjectionSecondPoint;
+    }
+    
+    public static boolean inRange(double start_x, double start_y, double end_x, double end_y,
+                                double point_x, double point_y) {
+      double dx = end_x - start_x;
+      double dy = end_y - start_y;
+      double innerProduct = (point_x - start_x)*dx + (point_y - start_y)*dy;
+      return 0 <= innerProduct && innerProduct <= dx*dx + dy*dy;
+  }
+
     
 
     
@@ -313,8 +375,8 @@ class ValueComparator implements Comparator {
         ObjectFeature b = (ObjectFeature)b2;
         if ( a.getX() > b.getX()) {
             return 1;
-        } else if (a.getX() == b.getX()){
-            if(a.getY() > b.getY()){
+        } else if ( Math.abs(a.getX() - b.getX()) < 0.0001){
+            if (Math.abs(a.getY() - b.getY()) < 0.0001){
                return 1; 
             }
             return -1;
