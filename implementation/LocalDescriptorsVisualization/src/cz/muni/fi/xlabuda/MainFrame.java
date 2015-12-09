@@ -1,5 +1,5 @@
 package cz.muni.fi.xlabuda;
-
+//BP TEXT: https://www.overleaf.com/3865085rdmxcj
 import com.sun.java.accessibility.util.EventQueueMonitor;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
