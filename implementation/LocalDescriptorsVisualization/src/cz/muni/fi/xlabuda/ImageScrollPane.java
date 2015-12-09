@@ -181,6 +181,12 @@ public class ImageScrollPane extends JPanel {
         Image newDefaultImage = defaultIcon.getImage().getScaledInstance(ICON_WIDTH, ICON_HEIGHT,
                 Image.SCALE_SMOOTH);
         ImageIcon newDefaultIcon = new ImageIcon(newDefaultImage);
+        
+        url = getClass().getResource("icons/switchProjPanels.png");
+        ImageIcon toggleProjectionPanelsIcon = new ImageIcon(url);
+        Image toggleProjectionPanelsImage = toggleProjectionPanelsIcon.getImage().getScaledInstance(ICON_WIDTH, ICON_HEIGHT,
+                Image.SCALE_SMOOTH);
+        ImageIcon toggleProjectionPanelsImageIcon = new ImageIcon(toggleProjectionPanelsImage);
 
         buttonsPanel = new JPanel(new BorderLayout());
         upperButtonPanel = new JPanel(new FlowLayout());
@@ -193,7 +199,7 @@ public class ImageScrollPane extends JPanel {
         fitToHeightButton = new JButton(newFitToHeightIcon);
         fitToScreenButton = new JButton(newFitToScreenIcon);
         
-        toggleProjectionButton = new JButton(newImageIcon);
+        toggleProjectionButton = new JButton(toggleProjectionPanelsImageIcon);
                 
         undoButton = new JButton(newUndoIcon);
         redoButton = new JButton(newRedoIcon);

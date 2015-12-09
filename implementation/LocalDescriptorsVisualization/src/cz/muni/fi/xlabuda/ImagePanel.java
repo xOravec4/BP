@@ -69,13 +69,17 @@ public final class ImagePanel extends JPanel {
     private Point2D secondProjectionPoint = null;
     
     private enum ProjectionPointMoving{NONE, FIRST, SECOND};
-    ProjectionPointMoving projectionPointMoving = ProjectionPointMoving.NONE;
+    private ProjectionPointMoving projectionPointMoving = ProjectionPointMoving.NONE;
+    
+    private boolean lock = false;
 
     public ImagePanel() {
         setBackground(Color.WHITE);
 
         addMouseMotionListener(new MouseMotionListener() {
             public void mouseDragged(MouseEvent e) {
+                
+
 
                 if(projectionPointMoving == projectionPointMoving.FIRST){
                     firstProjectionPoint = new Point2D.Double(e.getX() / zoomScale, e.getY() / zoomScale);
@@ -88,6 +92,7 @@ public final class ImagePanel extends JPanel {
                         firstProjectionPoint = new Point2D.Double(width, firstProjectionPoint.getY());
                     if(firstProjectionPoint.getY() > height)
                         firstProjectionPoint = new Point2D.Double(firstProjectionPoint.getX(), height);
+                    checkProjection(true);
                     repaint();
                     return;
                 }
@@ -101,6 +106,7 @@ public final class ImagePanel extends JPanel {
                         secondProjectionPoint = new Point2D.Double(width, secondProjectionPoint.getY());
                     if(secondProjectionPoint.getY() > height)
                         secondProjectionPoint = new Point2D.Double(secondProjectionPoint.getX(), height);
+                    checkProjection(true);
                     repaint();
                     return;
                 }
@@ -167,7 +173,7 @@ public final class ImagePanel extends JPanel {
                                        Double.valueOf(e.getPoint().getY() / zoomScale).intValue());
                             }
                         }
-                        getParentImageScrollPane().getParentMainFrame().repaintAll();
+                        //getParentImageScrollPane().getParentMainFrame().repaintAll();
                     }
                 }
                 
@@ -185,9 +191,12 @@ public final class ImagePanel extends JPanel {
                 
 
                 repaint();
+
             }
 
             public void mouseMoved(MouseEvent e) {
+
+                
                 if (frame.isShowSimilarDescriptorsMode()) {
                     Point nearestDescriptorsPoint = null;
                     double distance = Double.MAX_VALUE;
@@ -225,6 +234,8 @@ public final class ImagePanel extends JPanel {
         addMouseListener(new MouseListener() {
             // Left or Right mouse button = hide nearest descriptor
             public void mouseClicked(MouseEvent e) {
+
+                
                 MainFrame frame = getParentImageScrollPane().getParentMainFrame();
                 if (frame.isShowSimilarDescriptorsMode()) {
                     GlasspaneForSimilarDescriptors glasspane =
@@ -242,21 +253,11 @@ public final class ImagePanel extends JPanel {
                         int x = Double.valueOf(zoomedClickedPoint.getX() / zoomScale).intValue();
                         int y = Double.valueOf(zoomedClickedPoint.getY() / zoomScale).intValue();
                         descriptors.hideNearestDescriptors(new Point(x,y));
+                        System.out.println("P B");
+                        checkProjection(false);
                     }
                 }
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    
-                //System.out.println(e.getX() + " " + e.getY())  ;/*
-                /*
-                if(firstProjectionPoint == null){
-                firstProjectionPoint = new Point2D.Double(e.getX(), e.getY());
-                }
-                else if(secondProjectionPoint == null){
-                    secondProjectionPoint = new Point2D.Double(e.getX(), e.getY());
-                }*/
-                repaint();
-                
-                }
+
                 if (e.getButton() == MouseEvent.BUTTON3) {
                 descriptors.setProjectionPointB(e.getX(),e.getY() );
                 descriptors.hideNearestDescriptors(new Point(0,0));
@@ -265,20 +266,21 @@ public final class ImagePanel extends JPanel {
             }
 
             public void mousePressed(MouseEvent e) {
+
                 
                 if(firstProjectionPoint != null){
 
                     System.err.println(firstProjectionPoint.getX() *zoomScale + " " + firstProjectionPoint.getY() *zoomScale+ " vs " + e.getX() + " " + e.getY());
                     //int distance = (int)Math.sqrt((mouseX-firstProjectionPoint.getX())*(mouseX-firstProjectionPoint.getX())+(mouseY-firstProjectionPoint.getY())*(mouseY-firstProjectionPoint.getY()));
                     int distance = (int)Math.sqrt((e.getX()-firstProjectionPoint.getX()*zoomScale)*(e.getX()-firstProjectionPoint.getX()*zoomScale)+(e.getY()-firstProjectionPoint.getY()*zoomScale)*(e.getY()-firstProjectionPoint.getY()*zoomScale));
-                    if(distance < 10){
+                    if(distance < 10 * zoomScale){
                         projectionPointMoving = ProjectionPointMoving.FIRST;
                         System.out.println(firstProjectionPoint.getX()*zoomScale + " " + firstProjectionPoint.getY()*zoomScale + " vs " + e.getX() + " " + e.getY());
                     }
                 }
                 if(secondProjectionPoint != null){
                     int distance = (int)Math.sqrt((e.getX()-secondProjectionPoint.getX()*zoomScale)*(e.getX()-secondProjectionPoint.getX()*zoomScale)+(e.getY()-secondProjectionPoint.getY()*zoomScale)*(e.getY()-secondProjectionPoint.getY()*zoomScale));
-                    if(distance < 10){
+                    if(distance < 10* zoomScale){
                         projectionPointMoving = ProjectionPointMoving.SECOND;
                     }
                 }
@@ -304,12 +306,12 @@ public final class ImagePanel extends JPanel {
             // Create rectangle after end of mouse dragged
             // if rectangle is smaller than 6x6, it won't be created
             public void mouseReleased(MouseEvent e) {
-                
+
                 if(projectionPointMoving == ProjectionPointMoving.FIRST ||
                        projectionPointMoving == ProjectionPointMoving.SECOND ){
-                     if(getParentImageScrollPane().getImagePanel().getDescriptors() != null)
-                        if(getParentImageScrollPane().getImagePanel().getDescriptors().getProjectionType() != null)
-                            getParentImageScrollPane().getImagePanel().getDescriptors().checkProjection();
+                     checkProjection(false);
+                            
+                            
                 }
                 projectionPointMoving = ProjectionPointMoving.NONE;
                 
@@ -336,6 +338,7 @@ public final class ImagePanel extends JPanel {
                     }
                     gettingRectangle = false;
                 }
+                checkProjection(false);
             }
 
             public void mouseEntered(MouseEvent e) {}
@@ -586,8 +589,27 @@ public final class ImagePanel extends JPanel {
         
         if(firstProjectionPoint != null && secondProjectionPoint != null){
             int r = 20;
+            graphics2D.setStroke(new BasicStroke(4));
             graphics2D.drawLine((int)firstProjectionPoint.getX(), (int)firstProjectionPoint.getY(),
-                    (int)secondProjectionPoint.getX(), (int)secondProjectionPoint.getY());          
+                    (int)secondProjectionPoint.getX(), (int)secondProjectionPoint.getY());  
+            
+            /*
+            double angle = angle(secondProjectionPoint.getX(), secondProjectionPoint.getY(),firstProjectionPoint.getX(), firstProjectionPoint.getY());
+            
+            int asd = (int)( firstProjectionPoint.getX() + (Math.sin(angle) * 100)); 
+            int asdf = (int) (firstProjectionPoint.getY() + (Math.sin(angle) * 100));  
+            
+            int asdg = (int)( secondProjectionPoint.getX() + Math.sin(angle) * 100); 
+            int asdsd = (int) (secondProjectionPoint.getY() + Math.sin(angle) * 100); 
+            
+            graphics2D.drawLine((int)firstProjectionPoint.getX(), (int)firstProjectionPoint.getY(),asd ,asdf);*/
+            /*
+            Rectangle rect= new Rectangle();
+            rect.setFrameFromDiagonal(firstProjectionPoint, secondProjectionPoint);
+*/
+
+            //graphics2D.setColor(new Color(255, 100,100, 128 ));
+            //graphics2D.fillRect((int)firstProjectionPoint.getX(), (int)firstProjectionPoint.getY(),asdg ,asdsd);
         }
         
 
@@ -635,15 +657,56 @@ public final class ImagePanel extends JPanel {
         secondProjectionPoint = null;
     }
     
+    public Rectangle getViewportRange(ImageScrollPane scrollPane) {
+            double zoomScale = scrollPane.getImagePanel().getZoomScale();
+            Rectangle rect = scrollPane.getScrollPane().getViewport().getViewRect();
+            return new Rectangle(
+                    (int)(rect.getX() / zoomScale),
+                    (int) (rect.getY() / zoomScale),
+                    (int) (rect.getWidth() / zoomScale),
+                    (int) (rect.getHeight() / zoomScale));
+    }
     public void showProjectionPoints(){
         firstProjectionPoint = new Point2D.Double(width/3, height/2);
         secondProjectionPoint = new Point2D.Double((width/3) * 2, height/2);
+        
+        Rectangle a = getViewportRange(getParentImageScrollPane());
+       
+        if(a.getY() + a.getHeight() < height){
+            System.out.println(a);
+            firstProjectionPoint = new Point2D.Double(firstProjectionPoint.getX(), a.getY() + (a.getHeight()/2));
+            secondProjectionPoint = new Point2D.Double((secondProjectionPoint.getX()), a.getY() + (a.getHeight()/2));
+        }
+        if(a.getX() + a.getWidth() < width){
+            System.out.println(a);
+            firstProjectionPoint = new Point2D.Double(a.getX() + (a.getWidth()/3 ), firstProjectionPoint.getY());
+            secondProjectionPoint = new Point2D.Double(a.getX() + ((a.getWidth()/3) *2), secondProjectionPoint.getY());
+        }
     }
     
     public void showProjectionPoints(Point2D a, Point2D b){
         firstProjectionPoint = a;
         secondProjectionPoint = b;
     }
- 
+    
+    public void checkProjection(boolean checkOnlyProjection){
+        if(lock)
+            return;
+        if(getParentImageScrollPane().getImagePanel() != null)
+            if(getParentImageScrollPane().getImagePanel().getDescriptors() != null)
+                getParentImageScrollPane().getImagePanel().getDescriptors().checkProjection(checkOnlyProjection);
+    }
+    
+    public void setLock(boolean bool){
+        lock = bool;
+    }
+    
+    public static double angle (double x1, double y1, double x2, double y2) {
+       double xdiff = x1 - x2;
+       double ydiff = y1 - y2;
+       //double tan = xdiff / ydiff;
+       double atan = Math.atan2(ydiff, xdiff);
+       return atan;
+   }
     
 }

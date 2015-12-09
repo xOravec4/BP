@@ -527,12 +527,12 @@ public abstract class LocalDescriptors {
         }
         
         if(projection != null && !visualizationMode){
-            checkProjection();
+            //checkProjection();
         }
         if(visualizationMode){
             
             
-            getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
+            //getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
         }
         
         
@@ -933,23 +933,32 @@ public abstract class LocalDescriptors {
     public void setProjection(ProjectionTo projectionTo){
         System.out.println("Setting projection");
         projection = new Projection(projectionTo);
+        checkProjection(true);
     }
     
     public void setProjection(Projection projection){
         System.out.println("Setting projection");
         this.projection = projection;
+        checkProjection(true);
     }
     
     public void setProjection(ProjectionTo projectionTo, Point2D a, Point2D b){
         System.out.println("Setting projection");
         projection = new Projection(projectionTo, a, b);
+        checkProjection(true);
     }
     
     
-    public void checkProjection(){
+    public void checkProjection(boolean checkOnlyProjection){
+        
+        if(checkOnlyProjection && visualizationMode)
+            return;
         
         if(projection == null)
             return;
+        
+
+        
         
         Map <ObjectFeature, Float> proj = null;
         if(projection.getProjectionType() == ProjectionTo.CUSTOM){
@@ -963,6 +972,11 @@ public abstract class LocalDescriptors {
         else{
             proj =  projection.getProjection(visibleDescriptors);
         }
+        
+        if(visualizationMode){
+            getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
+            return;
+        }       
         ProjectionPanel bottomProjectionPanel = parentImagePanel.getParentImageScrollPane().getBottomProjectionPanel();
         ProjectionPanel sideProjectionPanel = parentImagePanel.getParentImageScrollPane().getSideProjectionPanel();
         bottomProjectionPanel.setData(proj);
@@ -991,5 +1005,7 @@ public abstract class LocalDescriptors {
     
     public void setVisualizationMode(boolean bool){
         visualizationMode = bool;
+        if(!bool)
+            checkProjection(false);
     }
 }

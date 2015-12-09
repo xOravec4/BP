@@ -158,7 +158,7 @@ public class Dialogs {
 
     public static void hooveredDescriptorColorChooserDialog(MainFrame frame) {
         if(frame.getVisualizationType() == MainFrame.VisualisationType.NEEDLEMANWUNSCH ||
-                frame.getVisualizationType() == MainFrame.VisualisationType.NEEDLEMANWUNSCH){
+                frame.getVisualizationType() == MainFrame.VisualisationType.SMITHWATERMAN){
         
             ProjectionGlassPane glasspane = (ProjectionGlassPane) frame.getGlassPane();
             Color newColor = JColorChooser.showDialog(
@@ -560,13 +560,13 @@ public class Dialogs {
                 List<ObjectFeature> result2 = null;
                 float similatity = 0;
                 if(algorithm == 1){
-                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( projection1.getSortedProjection(first),  projection2.getSortedProjection(second)); 
+                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( projection1.getSortedProjection(first),  projection2.getSortedProjection(second), frame); 
                     result1 = needlemanWunsch.getFirstSequence();
                     result2 = needlemanWunsch.getSecondSequence();
                     similatity = needlemanWunsch.getSimilarity();
                 }
                 else if(algorithm == 2){
-                    SmithWaterman smithWaterman = new SmithWaterman( projection1.getSortedProjection(first),  projection2.getSortedProjection(second)); 
+                    SmithWaterman smithWaterman = new SmithWaterman( projection1.getSortedProjection(first),  projection2.getSortedProjection(second), frame); 
                     result1 = smithWaterman.getFirstSequence();
                     result2 = smithWaterman.getSecondSequence();
                     similatity = smithWaterman.getSimilarity();
@@ -594,5 +594,30 @@ public class Dialogs {
         
         dialog.setVisible(true);
 
+     }
+     
+     
+     public static void chooseVisualizationProjection(){
+         
+         final JPanel panel = new JPanel();
+                final JRadioButton button1 = new JRadioButton("Projection to X");
+                final JRadioButton button2 = new JRadioButton("Projection to Y");
+                final JLabel label = new JLabel();
+                label.setText("asdfdasdf");
+                panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+                panel.add(label);
+                ButtonGroup group = new ButtonGroup();
+                group.add(button1);
+                group.add(button2);
+                panel.add(button1);
+                panel.add(button2);
+
+                JOptionPane.showMessageDialog(null, panel, "No projection selected.",  JOptionPane.PLAIN_MESSAGE);
+                if(button1.isSelected()){
+                    System.out.println("1");
+                }
+                if(button2.isSelected()){
+                    System.out.println("2");
+                }
      }
 }

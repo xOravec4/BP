@@ -115,7 +115,7 @@ public class ProjectionGlassPane extends JComponent {
                     (int) (rect.getY() / zoomScale),
                     (int) (rect.getWidth() / zoomScale),
                     (int) (rect.getHeight() / zoomScale));
-        }
+    }
     
     public boolean isInViewPort(ObjectFeature of, ImageScrollPane isp){
         
@@ -283,7 +283,7 @@ public class ProjectionGlassPane extends JComponent {
                 mainFrame.SetNWSWCurrentSimilarity(cost.getCost(descriptor, descriptor2));
                 Point2D descPos2 = getDescriptorPosition(getOtherISP(activeImageScrollPane), descriptor2);
                 if (activeImageScrollPane.getBottomProjectionPanel().isVisible()) {
-                    System.out.println("a");
+                    //System.out.println("a");
                     if((isInViewPort(descriptor,activeImageScrollPane ) )){
                         g2d.drawLine((int) descPos.getX(),
                             (int) descPos.getY(),
@@ -294,7 +294,7 @@ public class ProjectionGlassPane extends JComponent {
                     
                 } else if (activeImageScrollPane.getSideProjectionPanel().isVisible()) {
                     if((isInViewPort(descriptor,activeImageScrollPane ) )){
-                        System.out.println("b");
+                        //System.out.println("b");
                         g2d.drawLine((int) descPos.getX(),
                                 (int) descPos.getY(),
                                 10 + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
@@ -306,7 +306,7 @@ public class ProjectionGlassPane extends JComponent {
                 
                 if (getOtherISP(activeImageScrollPane).getBottomProjectionPanel().isVisible()) {
                     int value2 = getOtherISP(activeImageScrollPane).getBottomProjectionPanel().getDescriptorValueAt(order);
-                    System.out.println("c");
+                   // System.out.println("c");
                     if((isInViewPort(descriptor2,getOtherISP(activeImageScrollPane) ) )){
                         g2d.drawLine((int) descPos2.getX(),
                             (int) descPos2.getY(),
@@ -317,7 +317,7 @@ public class ProjectionGlassPane extends JComponent {
                     
                 } else if (getOtherISP(activeImageScrollPane).getSideProjectionPanel().isVisible()) {
                     int value2 = getOtherISP(activeImageScrollPane).getSideProjectionPanel().getDescriptorValueAt(order);
-                    System.out.println("d");
+                   // System.out.println("d");
                     if((isInViewPort(descriptor2,getOtherISP(activeImageScrollPane) ) )){
                         g2d.drawLine((int) descPos2.getX(),
                             (int) descPos2.getY(),

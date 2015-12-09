@@ -21,11 +21,14 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -33,8 +36,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import messif.objects.impl.ObjectFeature;
@@ -225,6 +231,9 @@ public class MainFrame extends JFrame {
     
     private Projection visualizationProjectionFirstImage = null;
     private Projection visualizationProjectionSecondImage = null;
+    
+    private JDialog ComputeVisualizationDialog = null;
+    private JProgressBar ComputeVisualizationProgressBar = null;
 
     /**
      * Create new instance of MainFrame and initialize the components for the frame
@@ -292,7 +301,9 @@ public class MainFrame extends JFrame {
         projectionFirstImageCustom = new JRadioButtonMenuItem();
         projectionSecondImageCustom = new JRadioButtonMenuItem();
         projectionTogglePositionFirstImage = new JMenuItem();
+        projectionTogglePositionFirstImage.setEnabled(false);
         projectionTogglePositionSecondImage = new JMenuItem();
+        projectionTogglePositionSecondImage.setEnabled(first);
         projectionResetFirstImage = new JMenuItem();
         projectionResetSecondImage  = new JMenuItem();      
         
@@ -719,7 +730,20 @@ public class MainFrame extends JFrame {
          smithWatermanButton.setText("SmithWaterman");
          smithWatermanButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-                Dialogs.ProjectionSelection(thisInstance, VisualisationType.SMITHWATERMAN.ordinal());
+                if(bothProjectionsSet()){
+                    setProjectionGlassPane();
+                    setVisualisationType(2);
+                    
+                    Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
+                    
+                    imageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
+                    secondImageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
+                    
+                    lockImagePanels(true);
+                    SmithWaterman smithWaterman = new SmithWaterman( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
+                       
+                }
             }
         
         
@@ -728,7 +752,7 @@ public class MainFrame extends JFrame {
         needlemanWunschButton.setText("NeedlemanWunsch");
         needlemanWunschButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-                //Dialogs.ProjectionSelection(thisInstance, VisualisationType.NEEDLEMANWUNSCH.ordinal());
+
                 if(bothProjectionsSet()){
                     setProjectionGlassPane();
                     setVisualisationType(1);
@@ -739,7 +763,13 @@ public class MainFrame extends JFrame {
                     imageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
                     secondImageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
                     
-                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second)); 
+                    
+                    lockImagePanels(true);
+                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
+                    //setComparationMode(true);
+                    //needlemanWunsch.execute();
+                    
+                    if(true)return;
                     List<ObjectFeature> result1 = null;
                     List<ObjectFeature> result2 = null;
                     result1 = needlemanWunsch.getFirstSequence();
@@ -756,43 +786,8 @@ public class MainFrame extends JFrame {
                     imageScrollPane.SetSideProjectionPanelInvisible();
                     secondImageScrollPane.SetSideProjectionPanelInvisible();
 
-                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());
-                    
+                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());   
                 }
-                if(bothProjectionsSet() && false){
-
-                    Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-                    Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-                    setProjectionGlassPane();
-                    setVisualisationType(1);
-                    
-                    visualizationProjectionFirstImage = imageScrollPane.getImagePanel().getDescriptors().getProjection();
-                    visualizationProjectionSecondImage = secondImageScrollPane.getImagePanel().getDescriptors().getProjection();
-                    
-                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( visualizationProjectionFirstImage.getSortedProjection(first),  visualizationProjectionSecondImage.getSortedProjection(second)); 
-                    List<ObjectFeature> result1 = null;
-                    List<ObjectFeature> result2 = null;
-                    result1 = needlemanWunsch.getFirstSequence();
-                    result2 = needlemanWunsch.getSecondSequence();
-
-                    setComparationMode(true);
-                    imageScrollPane.getBottomProjectionPanel().setData(result1);
-                    imageScrollPane.getSideProjectionPanel().setData(result1);
-                    secondImageScrollPane.getBottomProjectionPanel().setData(result2);
-                    secondImageScrollPane.getSideProjectionPanel().setData(result2);
-
-                    imageScrollPane.SetBottomProjectionPanelVisible();
-                    secondImageScrollPane.SetBottomProjectionPanelVisible();
-                    imageScrollPane.SetSideProjectionPanelInvisible();
-                    secondImageScrollPane.SetSideProjectionPanelInvisible();
-
-                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());
-                }
-                else{
-                    
-                }
-            
-            
             }
         });
         
@@ -814,6 +809,9 @@ public class MainFrame extends JFrame {
         projectionFirstImageToX.setText("To X");
         projectionFirstImageToX.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
+                
+                setProjection(imageScrollPane, ProjectionTo.X);
+                if(true)return;
                 resetProjection(imageScrollPane);
                 
                 imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.X);
@@ -835,6 +833,9 @@ public class MainFrame extends JFrame {
         projectionSecondImageToX.setText("To X");
         projectionSecondImageToX.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
+            
+            setProjection(secondImageScrollPane, ProjectionTo.X);
+                if(true)return;
                 resetProjection(secondImageScrollPane);
                 secondImageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.X);  
 
@@ -856,6 +857,9 @@ public class MainFrame extends JFrame {
         projectionFirstImageToY.setText("To Y");
         projectionFirstImageToY.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) { 
+            
+            setProjection(imageScrollPane, ProjectionTo.Y);
+                if(true)return;
                 resetProjection(imageScrollPane);
                 imageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.Y); 
                 projectionResetFirstImage.setEnabled(true);
@@ -875,7 +879,10 @@ public class MainFrame extends JFrame {
         
         projectionSecondImageToY.setText("To Y");
         projectionSecondImageToY.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(ActionEvent event) {   
+        public void actionPerformed(ActionEvent event) {  
+            
+            setProjection(secondImageScrollPane, ProjectionTo.Y);
+                if(true)return;
                 resetProjection(secondImageScrollPane);
                 secondImageScrollPane.getImagePanel().getDescriptors().setProjection(ProjectionTo.Y);               
 
@@ -895,7 +902,10 @@ public class MainFrame extends JFrame {
         
         projectionFirstImageCustom.setText("Custom");
         projectionFirstImageCustom.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(ActionEvent event) {                   
+        public void actionPerformed(ActionEvent event) { 
+            
+            setProjection(imageScrollPane, ProjectionTo.CUSTOM);
+                if(true)return;
                 resetProjection(imageScrollPane);
                 projectionResetFirstImage.setEnabled(true);
                 imageScrollPane.EnableProjectionPanelsToggling(true);
@@ -921,7 +931,11 @@ public class MainFrame extends JFrame {
         });
         projectionSecondImageCustom.setText("Custom");
         projectionSecondImageCustom.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(ActionEvent event) {                   
+        public void actionPerformed(ActionEvent event) { 
+            
+              
+            setProjection(secondImageScrollPane, ProjectionTo.CUSTOM);
+                if(true)return;
                 resetProjection(secondImageScrollPane);
                 projectionResetSecondImage.setEnabled(true);
                 secondImageScrollPane.getImagePanel().showProjectionPoints();
@@ -948,37 +962,48 @@ public class MainFrame extends JFrame {
         projectionTogglePositionFirstImage.setText("Toggle");
         projectionTogglePositionFirstImage.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {                   
-                if(imageScrollPane.getSideProjectionPanel().isVisible()){
-                    imageScrollPane.getSideProjectionPanel().setVisible(false);
-                    imageScrollPane.getBottomProjectionPanel().setVisible(true);
-                }
-                else{
-                    imageScrollPane.getSideProjectionPanel().setVisible(true);
-                    imageScrollPane.getBottomProjectionPanel().setVisible(false);
-                }
+                imageScrollPane.ToggleProjectionPanels();
             }
         });
         
         projectionTogglePositionSecondImage.setText("Toggle");
         projectionTogglePositionSecondImage.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {                   
-                if(secondImageScrollPane.getSideProjectionPanel().isVisible()){
-                    secondImageScrollPane.getSideProjectionPanel().setVisible(false);
-                    secondImageScrollPane.getBottomProjectionPanel().setVisible(true);
-                }
-                else{
-                    secondImageScrollPane.getSideProjectionPanel().setVisible(true);
-                    secondImageScrollPane.getBottomProjectionPanel().setVisible(false);
-                }
+                secondImageScrollPane.ToggleProjectionPanels();
             }
         });
         
         test.setText("test");
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                //getContentPane().add(comparativePanelNWSW, BorderLayout.NORTH);
-                Projection hersd = new Projection(ProjectionTo.X);
-                hersd.getSortedProjection(imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors());
+                JTextArea msgLabel;
+                JProgressBar progressBar;
+                final int MAXIMUM = 100;
+                JPanel panel;
+
+                progressBar = new JProgressBar(0, 100);
+                progressBar.setIndeterminate(false);
+                progressBar.setValue(50);
+                msgLabel = new JTextArea("deneme");
+                msgLabel.setEditable(false);
+
+                panel = new JPanel(new BorderLayout(5, 5));
+                panel.add(msgLabel, BorderLayout.PAGE_START);
+                panel.add(progressBar, BorderLayout.CENTER);
+                panel.setBorder(BorderFactory.createEmptyBorder(11, 11, 11, 11));
+
+                JDialog dialog = new JDialog();
+                dialog.getContentPane().add(panel);
+                dialog.setResizable(false);
+                dialog.pack();
+                dialog.setSize(500, dialog.getHeight());
+                dialog.setLocationRelativeTo(null);
+                dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                dialog.setAlwaysOnTop(false);
+                dialog.setVisible(true);
+                msgLabel.setBackground(panel.getBackground());
+                
+                dialog.dispose();
             }
         });
 
@@ -1272,9 +1297,9 @@ public class MainFrame extends JFrame {
         menuBar.add(fileMenu);
         menuBar.add(imageMenu);
         menuBar.add(descriptorsMenu);
+        menuBar.add(projectionMenu);
         menuBar.add(compareDescriptorsMenu);
         menuBar.add(modeMenu);
-        menuBar.add(projectionMenu);
         menuBar.add(helpMenu);
         menuBar.add(test);
       
@@ -1522,8 +1547,8 @@ public class MainFrame extends JFrame {
                 if (imagePanel.getDescriptors().getEncapsulatingClass().equals(secondImagePanel
                         .getDescriptors().getEncapsulatingClass())) {
                     showSimilarDescriptors.setEnabled(true);
-                    needlemanWunschButton.setEnabled(true);
-                    smithWatermanButton.setEnabled(true);
+                    //needlemanWunschButton.setEnabled(true);
+                    //smithWatermanButton.setEnabled(true);
                 } else {
                     return false;
                 }
@@ -1651,7 +1676,6 @@ public class MainFrame extends JFrame {
                     secondImageScrollPane.getBottomProjectionPanel().clear();
                     secondImageScrollPane.getSideProjectionPanel().clear();
                     
-                    
                     projectionResetFirstImage.setEnabled(true);
                     projectionResetFirstImage.setEnabled(true);
                     imageScrollPane.EnableProjectionPanelsToggling(true);
@@ -1701,8 +1725,8 @@ public class MainFrame extends JFrame {
                     secondImageScrollPane.getImagePanel().getDescriptors() != null) {
                 
                 showSimilarDescriptors.setEnabled(true);
-                needlemanWunschButton.setEnabled(true);
-                smithWatermanButton.setEnabled(true);
+                //needlemanWunschButton.setEnabled(true);
+                //smithWatermanButton.setEnabled(true);
             } else {
                 showSimilarDescriptors.setEnabled(false);
                 needlemanWunschButton.setEnabled(false);
@@ -1805,6 +1829,10 @@ public class MainFrame extends JFrame {
     }
     
     public void resetProjection(ImageScrollPane isp){
+        
+        needlemanWunschButton.setEnabled(false);
+        smithWatermanButton.setEnabled(false); 
+                   
         ProjectionTo type = isp.getImagePanel().getDescriptors().getProjectionType();
         if( type == ProjectionTo.CUSTOM){
             isp.getImagePanel().HideCustomProjectionPoints();
@@ -1821,12 +1849,14 @@ public class MainFrame extends JFrame {
             projectionFirstImageToY.setSelected(false);
             projectionFirstImageCustom.setSelected(false);
             projectionResetFirstImage.setEnabled(false);
+            projectionTogglePositionFirstImage.setEnabled(false);
         }
         if(isp == secondImageScrollPane){
             projectionSecondImageToX.setSelected(false);
             projectionSecondImageToY.setSelected(false);
             projectionSecondImageCustom.setSelected(false);
             projectionResetSecondImage.setEnabled(false);
+            projectionTogglePositionSecondImage.setEnabled(false);
         }
         
                 
@@ -1890,29 +1920,160 @@ public class MainFrame extends JFrame {
     }
     
     public void RefreshVisualization(){
+                    System.out.println("refresh command");
                     Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
                     Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
                     
 
+                    lockImagePanels(true);
+                    if(visualisationType == VisualisationType.NEEDLEMANWUNSCH)
+                        new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
+                    else if(visualisationType == VisualisationType.SMITHWATERMAN)
+                        new SmithWaterman( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
+                    //setComparationMode(true);
+                    //needlemanWunsch.execute();
+    }
+    
+    public MainFrame getMainFrame(){
+        return this;
+    }
+    
+    public void ShowVisualizationProgressBar(int max){
+    
+                System.out.println("Creating 1");
+ 
+                final int MAXIMUM = 100;
+                JPanel panel;
+                //JDialog panel;
+                //ComputeVisualizationDialog.dispose();
+                
+                ComputeVisualizationDialog = new JDialog();
+                ComputeVisualizationProgressBar = new JProgressBar(0, max);
+                ComputeVisualizationProgressBar.setIndeterminate(true);
+                //ComputeVisualizationProgressBar.setValue(50);
+                JLabel msgLabel = new JLabel();
+                msgLabel.setText("Computing similarity...");
+
+                panel = new JPanel(new BorderLayout(5, 5));
+                panel.add(msgLabel, BorderLayout.PAGE_START);
+                panel.add(ComputeVisualizationProgressBar, BorderLayout.CENTER);
+                panel.setBorder(BorderFactory.createEmptyBorder(11, 11, 11, 11));
+
+                
+                ComputeVisualizationDialog.getContentPane().add(panel);
+                ComputeVisualizationDialog.setResizable(false);
+                ComputeVisualizationDialog.pack();
+                ComputeVisualizationProgressBar.setIndeterminate(false);
+                ComputeVisualizationDialog.setSize(500, ComputeVisualizationDialog.getHeight());
+                ComputeVisualizationDialog.setLocationRelativeTo(null);
+                ComputeVisualizationDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                ComputeVisualizationDialog.setAlwaysOnTop(true);
+                
+                //ComputeVisualizationDialog.setUndecorated(true);
+                ComputeVisualizationDialog.setVisible(true);
+                msgLabel.setBackground(panel.getBackground());
+                System.out.println("Creating DONE");
+                
+    }
+    
+    public void setDataToVisualizationProgressBar(int current){
+            //System.out.println("SET");
+        //ComputeVisualizationProgressBar.setIndeterminate(false);
+        ComputeVisualizationProgressBar.setValue(current);
+        if(current == ComputeVisualizationProgressBar.getMaximum()){
+         ComputeVisualizationDialog.dispose();
+        ComputeVisualizationDialog = null;
+        lockImagePanels(false);
+        System.out.println("Disposing");
+        }
+
+    }
+    
+    public void HideVisualizationProgressBar(){
+        ComputeVisualizationDialog.dispose();
+        ComputeVisualizationDialog = null;
+        lockImagePanels(false);
+        System.out.println("Disposing");
+    }
+    
+    public void lockImagePanels(boolean bool){
+        imageScrollPane.getImagePanel().setLock(bool);
+        secondImageScrollPane.getImagePanel().setLock(bool);
+    }
+    
+    public void setProjection(ImageScrollPane isp, ProjectionTo projectionTo){
+        
+                resetProjection(isp);
+                
+                
+                if(projectionTo == ProjectionTo.CUSTOM){
+                    isp.getImagePanel().showProjectionPoints();
+                    Point2D a = secondImageScrollPane.getImagePanel().getFirstProjectionPoint();
+                    Point2D b = secondImageScrollPane.getImagePanel().getSecondProjectionPoint();
+                    isp.getImagePanel().getDescriptors().setProjection(projectionTo, a, b);
+                }
+                else{
+                    isp.getImagePanel().getDescriptors().setProjection(projectionTo);
+                }
+                
+                if(isp == imageScrollPane){
+                    projectionTogglePositionFirstImage.setEnabled(true);
+                    projectionResetFirstImage.setEnabled(true);
+                }   
+                else{
+                    projectionResetSecondImage.setEnabled(true);
+                    projectionTogglePositionSecondImage.setEnabled(true);
+                }
                     
-                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second)); 
-                    List<ObjectFeature> result1 = null;
-                    List<ObjectFeature> result2 = null;
-                    result1 = needlemanWunsch.getFirstSequence();
-                    result2 = needlemanWunsch.getSecondSequence();
-                    
+                isp.EnableProjectionPanelsToggling(true);
 
-                    imageScrollPane.getBottomProjectionPanel().setData(result1);
-                    imageScrollPane.getSideProjectionPanel().setData(result1);
-                    secondImageScrollPane.getBottomProjectionPanel().setData(result2);
-                    secondImageScrollPane.getSideProjectionPanel().setData(result2);
-
-                    imageScrollPane.SetBottomProjectionPanelVisible();
-                    secondImageScrollPane.SetBottomProjectionPanelVisible();
-                    imageScrollPane.SetSideProjectionPanelInvisible();
-                    secondImageScrollPane.SetSideProjectionPanelInvisible();
-
-                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());
+                setProjectionGlassPane();
+               
+                if(isp == imageScrollPane){
+                    if(!imageScrollPane.isProjectionVisible()){
+                        imageScrollPane.SetBottomProjectionPanelVisible();
+                    }
+                }
+                else{
+                    if(!secondImageScrollPane.isProjectionVisible()){
+                        secondImageScrollPane.SetBottomProjectionPanelVisible();
+                    }
+                }
+                
+                if(isp == imageScrollPane){
+                    projectionFirstImageToX.setSelected(false);
+                    projectionFirstImageToY.setSelected(false);
+                    projectionFirstImageCustom.setSelected(false);
+                    switch (projectionTo){
+                        case X: projectionFirstImageToX.setSelected(true);
+                                break;
+                        case Y: projectionFirstImageToY.setSelected(true);
+                                break;
+                        case CUSTOM:  projectionFirstImageCustom.setSelected(true);
+                    }   
+                }
+                else{
+                    projectionSecondImageToX.setSelected(false);
+                    projectionSecondImageToY.setSelected(false);
+                    projectionSecondImageCustom.setSelected(false);
+                    switch (projectionTo){
+                        case X: projectionSecondImageToX.setSelected(true);
+                                break;
+                        case Y: projectionSecondImageToY.setSelected(true);
+                                break;
+                        case CUSTOM:  projectionSecondImageCustom.setSelected(true);
+                    }
+                }
+                
+                if(bothProjectionsSet()){
+                    needlemanWunschButton.setEnabled(true);
+                    smithWatermanButton.setEnabled(true);
+                }
+                else{
+                    needlemanWunschButton.setEnabled(false);
+                    smithWatermanButton.setEnabled(false); 
+                }
+        
     }
     
     

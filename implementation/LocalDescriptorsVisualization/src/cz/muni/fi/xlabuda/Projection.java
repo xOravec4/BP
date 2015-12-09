@@ -156,14 +156,14 @@ public class Projection  {
             for(int i=0;i<keys.size();i++){
                 //System.out.println("JUST TEST " + entry.getValue() + " vs " + values.get(i));
                 if( Math.abs(entry.getValue()- values.get(i)) < 0.00000001){
-                    System.out.println("ERRORRRRRRRRRRRRRRRRR they are same");
+                   /* System.out.println("ERRORRRRRRRRRRRRRRRRR they are same");
                     System.out.println(entry.getKey());
                     System.out.println(keys.get(i));
                     System.out.println("entry.getKey()   " + entry.getKey().getX() +"  +  " +entry.getKey().getY() );
                     System.out.println("keys.get(i)   " + keys.get(i).getX() +"  <  " +keys.get(i).getY() );
                     System.out.println("ORIENTATION  " + entry.getKey().getOrientation() + " " + keys.get(i).getOrientation());
                     System.out.println("");
-                    
+                    */
                     
                     if(Math.abs(  (entry.getKey().getOrientation() -  keys.get(i).getOrientation() ) )< 0.00001){
                         
@@ -220,7 +220,7 @@ public class Projection  {
             
             
         }
-        
+        /*
                   System.out.println("FINAL");
             System.out.println("");
             System.out.println("");
