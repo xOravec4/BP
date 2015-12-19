@@ -367,9 +367,11 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
     }
     
     public boolean descriptorExistsAt(int i){
+        
         if(dataList.get(i) == null)
             return false;
         return true;
+                
     }
     
 

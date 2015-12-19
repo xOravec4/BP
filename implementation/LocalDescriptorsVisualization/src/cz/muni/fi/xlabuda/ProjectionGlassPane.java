@@ -63,13 +63,16 @@ public class ProjectionGlassPane extends JComponent {
     
     int activePanel;
     
-    public ProjectionGlassPane(ImageScrollPane imageScrollPane, ImageScrollPane secondImageScrollPane){ 
+    public ProjectionGlassPane(ImageScrollPane imageScrollPane, ImageScrollPane secondImageScrollPane, Color color){ 
         this.imageScrollPane = imageScrollPane;
         this.secondImageScrollPane = secondImageScrollPane;
         mainFrame = imageScrollPane.getParentMainFrame();
+        descriptorColor = color;
         getParent();
        // super(null);
     }
+    
+    
     
     public void setActivePanel(int i){
         activePanel = i;

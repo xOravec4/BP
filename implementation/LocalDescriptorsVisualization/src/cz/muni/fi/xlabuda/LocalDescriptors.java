@@ -117,6 +117,8 @@ public abstract class LocalDescriptors {
     
     boolean visualizationMode = false;
     
+    private boolean locked = false;
+    
 
     public LocalDescriptors() {        
         visibleDescriptors = new HashSet<ObjectFeature>();
@@ -133,6 +135,8 @@ public abstract class LocalDescriptors {
         
         //ProjectionPointA.setLocation(0, 0);
         ProjectionPointAy=6;
+        
+       
     }
 
 
@@ -513,10 +517,11 @@ public abstract class LocalDescriptors {
     //********* OTHER METHODS **********//
 
     /**
-     * Paint descriptors on graphics
+     *  descriptors on graphics
      * @param graphics where to paint descriptors
      */
     public final void paint(Graphics2D graphics) {
+        
         if (this.graphics == null) {
             this.graphics = graphics;
         }
@@ -526,8 +531,8 @@ public abstract class LocalDescriptors {
             draw(graphics, iterator.next());
         }
         
-        if(projection != null && !visualizationMode){
-            //checkProjection();
+        if(projection != null && !locked){
+            //recalculateProjection();
         }
         if(visualizationMode){
             
@@ -635,7 +640,7 @@ public abstract class LocalDescriptors {
      * Set state as hiden to the nearest descriptors to the given point
      * @param point nearest point to descriptor
      */
-    public final void hideNearestDescriptors(Point point) {
+    public final boolean hideNearestDescriptors(Point point) {
         Iterator<ObjectFeature> iterator = visibleDescriptors.iterator();
         double shortestDistance = Double.MAX_VALUE;
         double calculatedDistance;
@@ -693,10 +698,16 @@ public abstract class LocalDescriptors {
 
             hiddenDescriptorsByClick.add(nearestDescriptor);
             visibleDescriptors.remove(nearestDescriptor);
+            
+           parentImagePanel.repaint();
+           parentImagePanel.getParentImageScrollPane().setDescriptorsLabels(); 
+           
+           return true;
         }
 
         parentImagePanel.repaint();
         parentImagePanel.getParentImageScrollPane().setDescriptorsLabels();
+        return false;
     }
 
 
@@ -933,33 +944,24 @@ public abstract class LocalDescriptors {
     public void setProjection(ProjectionTo projectionTo){
         System.out.println("Setting projection");
         projection = new Projection(projectionTo);
-        checkProjection(true);
+        recalculateProjection();
     }
     
     public void setProjection(Projection projection){
         System.out.println("Setting projection");
         this.projection = projection;
-        checkProjection(true);
+        recalculateProjection();
     }
     
     public void setProjection(ProjectionTo projectionTo, Point2D a, Point2D b){
         System.out.println("Setting projection");
         projection = new Projection(projectionTo, a, b);
-        checkProjection(true);
+        recalculateProjection();
     }
     
-    
-    public void checkProjection(boolean checkOnlyProjection){
-        
-        if(checkOnlyProjection && visualizationMode)
-            return;
-        
-        if(projection == null)
-            return;
-        
-
-        
-        
+    public void recalculateProjection(){
+       
+       
         Map <ObjectFeature, Float> proj = null;
         if(projection.getProjectionType() == ProjectionTo.CUSTOM){
             proj = projection.getProjection(visibleDescriptors,
@@ -973,16 +975,29 @@ public abstract class LocalDescriptors {
             proj =  projection.getProjection(visibleDescriptors);
         }
         
-        if(visualizationMode){
-            getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
-            return;
-        }       
         ProjectionPanel bottomProjectionPanel = parentImagePanel.getParentImageScrollPane().getBottomProjectionPanel();
         ProjectionPanel sideProjectionPanel = parentImagePanel.getParentImageScrollPane().getSideProjectionPanel();
         bottomProjectionPanel.setData(proj);
         sideProjectionPanel.setData(proj);
         bottomProjectionPanel.repaint();
         sideProjectionPanel.repaint();
+        
+    }
+    //checkOnlyProjection
+    public void recalculateVisualization(){
+        
+        if(projection == null)
+            return; 
+        
+        System.out.println("Recalculatin projection");
+        recalculateProjection();
+        
+        if(visualizationMode){
+            System.out.println("Recalculatin visualization");
+            getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
+            return;
+        }       
+        
     }
     
     public void cancelProjection(){
@@ -1006,6 +1021,10 @@ public abstract class LocalDescriptors {
     public void setVisualizationMode(boolean bool){
         visualizationMode = bool;
         if(!bool)
-            checkProjection(false);
+            recalculateVisualization();
+    }
+    
+    public void setLock(boolean locked){
+        this.locked = locked;
     }
 }

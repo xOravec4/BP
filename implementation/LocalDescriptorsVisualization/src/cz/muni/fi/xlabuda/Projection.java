@@ -20,7 +20,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+import static java.util.Map.Entry.comparingByValue;
 import java.util.TreeMap;
+import static java.util.stream.Collectors.toList;
 import javax.swing.JOptionPane;
 
 /**
@@ -60,6 +62,7 @@ public class Projection  {
     
     public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList)
     {
+                System.out.println("Projection input size: " + objFeatureList.size());
         Map<ObjectFeature, Float> result = new HashMap<ObjectFeature, Float>();
         
         switch (projectionTo)
@@ -69,6 +72,7 @@ public class Projection  {
                 {
                     result.put(objectFeature, objectFeature.getX());
                 }
+               System.out.println("Projection output size: " + result.size());
                 return result;
             case Y:
                 for(ObjectFeature objectFeature : objFeatureList)
@@ -96,6 +100,7 @@ public class Projection  {
     
      public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList, int imageWidth, int imageHeigt, Point2D A, Point2D B)
     {
+
         Map<ObjectFeature, Float> result = new HashMap<ObjectFeature, Float>();
         custonProjectionFirstPoint = A;
         custonProjectionSecondPoint = B;
@@ -113,27 +118,75 @@ public class Projection  {
                             objectFeature.getX() * imageWidth, objectFeature.getY() * imageHeigt));
                     */
                 } 
+                
                 return result;
            default:
                 return null;
         }
     }
     
-    public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map) {
-    Comparator<K> valueComparator =  new Comparator<K>() {
-        public int compare(K k1, K k2) {
-            int compare = map.get(k2).compareTo(map.get(k1));
-            if (compare == 0) return 1;
-            else return compare;
+
+    public boolean compare(ObjectFeature o1, Float f1, ObjectFeature o2, Float f2){
+        
+        if( Math.abs(f1- f2) < 0.00000001){
+            if(o1.getOrientation() < o2.getOrientation())
+                return true;
+            else
+                return false;
+            
         }
-    };
-    Map<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
-    sortedByValues.putAll(map);
-    return sortedByValues;
-}
+        
+       if (f1 < f2){
+            return true;
+            }
+       
+        return false;
+        
+    }
+     public List<ObjectFeature> getSortedProjection2(Set<ObjectFeature> objFeatureList){
+        System.out.println("Projection sorted2 input size: " + objFeatureList.size());
+        
+        Map<ObjectFeature, Float> result = getProjection(objFeatureList);
+        
+        List<ObjectFeature> keys = new ArrayList<ObjectFeature>();
+        List<Float> values = new ArrayList<Float>();
+         
+        for (Map.Entry<ObjectFeature, Float> entry : result.entrySet()) {
+        
+            if(keys.size() == 0){
+                keys.add(entry.getKey());
+                values.add(entry.getValue());
+                System.out.println("ALFA");
+                continue;
+            }
+            
+            for(int i=0;i<keys.size();i++){
+                
+                if(i==keys.size()-1){
+                    System.out.println("EPSILON");
+                    keys.add( entry.getKey());
+                    values.add( entry.getValue());
+                    //System.out.println("GAMA");
+                    break;
+                }
+                
+                if(compare(  entry.getKey(), entry.getValue(), keys.get(i), values.get(i)      )){
+                   keys.add(i, entry.getKey());
+                   values.add(i, entry.getValue());
+                   break;
+                }
+                else{
+                    //continue;
+                    }
+                
+            }
+        }
+        System.out.println("Projection sorted2 output size: " + keys.size());    
+        return keys; 
+     }
     
     
-    public List<ObjectFeature> getSortedProjection(Set<ObjectFeature> objFeatureList){
+public List<ObjectFeature> getSortedProjection(Set<ObjectFeature> objFeatureList){
         
         Map<ObjectFeature, Float> result = getProjection(objFeatureList);
         
@@ -238,7 +291,6 @@ public class Projection  {
         /*
         System.out.println("STARt");
         for(int i=0;i<values.size();i++){
-
             System.out.println(values.get(i));
         }
         System.out.println("STOP");*/
@@ -256,7 +308,6 @@ public class Projection  {
                   .compareTo(((Map.Entry) (o2)).getValue());
               }
          });
-
         List result = new ArrayList();
         for (Iterator it = list.iterator(); it.hasNext();) {
             Map.Entry entry = (Map.Entry)it.next();
@@ -265,7 +316,6 @@ public class Projection  {
         return result;
         */
     }
-
     
     public void projectionToLine(Point a1, Point a2)
     {

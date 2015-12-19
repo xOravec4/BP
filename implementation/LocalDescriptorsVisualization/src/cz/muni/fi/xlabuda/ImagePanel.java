@@ -92,7 +92,7 @@ public final class ImagePanel extends JPanel {
                         firstProjectionPoint = new Point2D.Double(width, firstProjectionPoint.getY());
                     if(firstProjectionPoint.getY() > height)
                         firstProjectionPoint = new Point2D.Double(firstProjectionPoint.getX(), height);
-                    checkProjection(true);
+                    recalculateProjectionVisualization();
                     repaint();
                     return;
                 }
@@ -106,7 +106,7 @@ public final class ImagePanel extends JPanel {
                         secondProjectionPoint = new Point2D.Double(width, secondProjectionPoint.getY());
                     if(secondProjectionPoint.getY() > height)
                         secondProjectionPoint = new Point2D.Double(secondProjectionPoint.getX(), height);
-                    checkProjection(true);
+                    recalculateProjectionVisualization();
                     repaint();
                     return;
                 }
@@ -252,9 +252,11 @@ public final class ImagePanel extends JPanel {
                         Point zoomedClickedPoint = e.getPoint();
                         int x = Double.valueOf(zoomedClickedPoint.getX() / zoomScale).intValue();
                         int y = Double.valueOf(zoomedClickedPoint.getY() / zoomScale).intValue();
-                        descriptors.hideNearestDescriptors(new Point(x,y));
-                        System.out.println("P B");
-                        checkProjection(false);
+                        if(descriptors.hideNearestDescriptors(new Point(x,y))){
+                          System.out.println("P B");
+                            recalculateProjectionVisualization();   
+                        }
+                       
                     }
                 }
 
@@ -295,6 +297,7 @@ public final class ImagePanel extends JPanel {
                     } else {
                         getParentImageScrollPane().getParentMainFrame().repaintAll();
                     }
+                    recalculateProjectionVisualization();
                 }
 
                 // Start move image in panel
@@ -309,7 +312,8 @@ public final class ImagePanel extends JPanel {
 
                 if(projectionPointMoving == ProjectionPointMoving.FIRST ||
                        projectionPointMoving == ProjectionPointMoving.SECOND ){
-                     checkProjection(false);
+                     recalculateProjectionVisualization();
+                     System.out.println("P LDd");
                             
                             
                 }
@@ -325,6 +329,9 @@ public final class ImagePanel extends JPanel {
                                     rectangleStartPoint.getX()).intValue(),
                             Double.valueOf(rectangleEndPoint.getY() -
                                     rectangleStartPoint.getY()).intValue()));
+                            
+                            recalculateProjectionVisualization();
+                            System.out.println("P LD");
                     } else {
                         rectangleStartPoint = null;
                         rectangleEndPoint = null;
@@ -337,8 +344,9 @@ public final class ImagePanel extends JPanel {
                         repaint();
                     }
                     gettingRectangle = false;
+                    
                 }
-                checkProjection(false);
+              
             }
 
             public void mouseEntered(MouseEvent e) {}
@@ -689,12 +697,21 @@ public final class ImagePanel extends JPanel {
         secondProjectionPoint = b;
     }
     
-    public void checkProjection(boolean checkOnlyProjection){
+    public void recalculateProjectionVisualization(){
         if(lock)
             return;
         if(getParentImageScrollPane().getImagePanel() != null)
             if(getParentImageScrollPane().getImagePanel().getDescriptors() != null)
-                getParentImageScrollPane().getImagePanel().getDescriptors().checkProjection(checkOnlyProjection);
+                getParentImageScrollPane().getImagePanel().getDescriptors().recalculateVisualization();
+    }
+    
+    
+    public void checkPrdojection(boolean checkOnlyProjection){
+        if(lock)
+            return;
+        if(getParentImageScrollPane().getImagePanel() != null)
+            if(getParentImageScrollPane().getImagePanel().getDescriptors() != null){}
+               // getParentImageScrollPane().getImagePanel().getDescriptors().checkProjection(checkOnlyProjection);
     }
     
     public void setLock(boolean bool){

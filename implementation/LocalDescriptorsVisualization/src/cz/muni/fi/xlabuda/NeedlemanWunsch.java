@@ -35,17 +35,21 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
     //SequenceMatchingCost cost
 
     
-     NeedlemanWunsch(List <ObjectFeature> list1,  List <ObjectFeature> list2, MainFrame mainFrame){
+     NeedlemanWunsch(List <ObjectFeature> list1,  List <ObjectFeature> list2, MainFrame mainFrame) {
          this(SequenceMatchingCost.SIFT_DEFAULT, list1, list2, mainFrame);
+         SequenceMatchingCost a = new SequenceMatchingCost();
+         
      }
     
-    NeedlemanWunsch(SequenceMatchingCost cost, List <ObjectFeature> list1,  List <ObjectFeature> list2, MainFrame mainFrame){
+    NeedlemanWunsch(SequenceMatchingCost cost, List <ObjectFeature> list1,  List <ObjectFeature> list2, MainFrame mainFrame) {
         this.cost = cost;
         this.list1 = list1;
         this.list2 = list2;
         this.mainFrame = mainFrame;
         
         execute();
+
+        
         if(true) return;
         //list1 = list2;
         
@@ -234,6 +238,9 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
     @Override
     protected Void doInBackground() throws Exception {
         
+        System.out.println("First Input size: " + list1.size());
+        System.out.println("Second input size: " + list2.size());
+                
         mainFrame.ShowVisualizationProgressBar(list1.size());
         for(int i=0;i<list1.size()-1;i++){
             if(true)break;
@@ -255,6 +262,12 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
                 System.out.println();
             }
 
+        }
+        
+        for(int i=0;i<list1.size()-1;i++){
+            System.out.println("A: "+ list1.get(i));
+            System.out.println("B: "+ list2.get(i));
+            System.out.println();
         }
         System.out.println("PRINT TWO INPUT LISTS END");
         
@@ -376,6 +389,8 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
         mainFrame.getSecondScrollPane().SetSideProjectionPanelInvisible();
 
         mainFrame.SetNWSWTotalSimilarity(similarity);
+        
+
         
         //mainFrame.HideVisualizationProgressBar();
         return null;

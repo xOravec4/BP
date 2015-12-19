@@ -37,7 +37,7 @@ public class SmithWaterman extends SwingWorker<Void, Void>{
      
      SmithWaterman(SequenceMatchingCost cost, List <ObjectFeature> list1,  List <ObjectFeature> list2, MainFrame mainFrame) {
          
-         this.cost = cost;
+        this.cost = cost;
         this.list1 = list1;
         this.list2 = list2;
         this.mainFrame = mainFrame;

@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,6 +30,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import messif.objects.impl.ObjectFeature;
+import messif.objects.util.SequenceMatchingCost;
 
 /**
  * Input and other dialogs for main frame.
@@ -620,4 +622,156 @@ public class Dialogs {
                     System.out.println("2");
                 }
      }
+     
+    public static void SequenceMatchingAlgorithmScrogingDialog(final MainFrame frame, final VisualisationType type) {
+        if(type == VisualisationType.BRUTEFORCE)
+            return;
+        
+        final JDialog dialog;
+        final JOptionPane optionPane = new JOptionPane();
+        
+        final JPanel spinnerPanel = new JPanel();    
+        
+        final SpinnerModel matchExactModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getMatchExact(), 0, 50, 0.1f);
+        final SpinnerModel matchApproximateModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getMatchApprox(), 0, 50, 0.1f);
+        final SpinnerModel matchMissmatchModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getMatchMismatch(), -50, 0, 0.1f);
+        final SpinnerModel gapOpeningModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getGapOpening(), 0, 50, 0.1f);
+        final SpinnerModel gapContinueModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getGapContinue(), 0, 50, 0.1f);
+        
+        final JSpinner matchExactSpinner = new JSpinner(matchExactModel);
+        
+        final JSpinner matchApproximateSpinner = new JSpinner(matchApproximateModel);
+        final JSpinner matchMissmatchSpinner = new JSpinner(matchMissmatchModel);
+        final JSpinner gapOpeningSpinner = new JSpinner(gapOpeningModel);
+        final JSpinner gapContinueSpinner = new JSpinner(gapContinueModel);
+        
+
+        Dimension d = matchExactSpinner.getPreferredSize();  
+        d.width = 50;  
+        matchExactSpinner.setPreferredSize(d);
+        
+        Dimension d2 = matchApproximateSpinner.getPreferredSize();  
+        d2.width = 50;  
+        matchApproximateSpinner.setPreferredSize(d);
+        
+        Dimension d3 = matchMissmatchSpinner.getPreferredSize();  
+        d3.width = 50;  
+        matchMissmatchSpinner.setPreferredSize(d);
+        
+        Dimension d4 = gapOpeningSpinner.getPreferredSize();  
+        d4.width = 50;  
+        gapOpeningSpinner.setPreferredSize(d);
+        
+        Dimension d5 = gapContinueSpinner.getPreferredSize();  
+        d5.width = 50;  
+        gapContinueSpinner.setPreferredSize(d);
+        
+        JLabel matchExact = new JLabel("matchExact");
+        JLabel matchApproximate = new JLabel("matchApproximate");
+        JLabel matchMissmatch = new JLabel("matchMissmatch");
+        JLabel gapOpening = new JLabel("gapOpening");
+        JLabel gapContinue = new JLabel("gapContinue");
+        
+        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.PAGE_AXIS));
+        
+        final JPanel row1 = new JPanel();
+        row1.add(matchExact);
+        row1.add(matchExactSpinner);
+        spinnerPanel.add(row1);
+        
+        final JPanel row2 = new JPanel();
+        row2.add(matchApproximate);
+        row2.add(matchApproximateSpinner);
+        spinnerPanel.add(row2);
+        
+        final JPanel row3 = new JPanel();
+        row3.add(matchMissmatch);
+        row3.add(matchMissmatchSpinner);
+        spinnerPanel.add(row3);
+        
+        final JPanel row4 = new JPanel();
+        row4.add(gapOpening);
+        row4.add(gapOpeningSpinner);
+        spinnerPanel.add(row4);
+        
+        if(type == VisualisationType.SMITHWATERMAN){
+            final JPanel row5 = new JPanel();
+            row5.add(gapContinue);
+            row5.add(gapContinueSpinner);
+            spinnerPanel.add(row5);
+        }
+        
+ 
+               
+        
+        JButton approveButton = new JButton();
+        approveButton.setText(localLanguage.getString("button"));
+
+        optionPane.setMessage(new Object[] {"", spinnerPanel});
+        optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
+        optionPane.setOptions(new Object[] {approveButton});
+
+        dialog = optionPane.createDialog(frame, "Choose scoring system");
+
+        
+        
+        approveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                
+                 float a = ((Double) matchApproximateSpinner.getValue()).floatValue();
+         System.out.println("dbl a: "+ a);
+         
+
+                frame.setProjectionGlassPane();
+                
+                if(type ==VisualisationType.NEEDLEMANWUNSCH)
+                     frame.setVisualisationType(VisualisationType.NEEDLEMANWUNSCH);
+                else if(type ==VisualisationType.SMITHWATERMAN)
+                    frame.setVisualisationType(VisualisationType.SMITHWATERMAN);
+
+                Set <ObjectFeature> first = frame.getFirstScrollPane().getImagePanel().getDescriptors().getVisibleDescriptors();
+                Set <ObjectFeature> second = frame.getSecondScrollPane().getImagePanel().getDescriptors().getVisibleDescriptors();
+                
+                frame.getFirstScrollPane().getImagePanel().getDescriptors().setVisualizationMode(true);
+                frame.getSecondScrollPane().getImagePanel().getDescriptors().setVisualizationMode(true);
+                
+                frame.lockImagePanels(true);
+                
+            
+
+        
+                SequenceMatchingCost cost = new SequenceMatchingCost(
+                        ((Double) gapOpeningSpinner.getValue()).floatValue(), 
+                        ((Double) gapContinueSpinner.getValue()).floatValue() , 
+                        ((Double) matchExactSpinner.getValue()).floatValue() , 
+                        ((Double) matchApproximateSpinner.getValue()).floatValue() , 
+                        ((Double) matchMissmatchSpinner.getValue()).floatValue(), 
+                        120.0f, 
+                        240.0f);
+                
+                frame.setSequenceMatchingScoring(cost);
+
+                if(type ==VisualisationType.SMITHWATERMAN)
+                new SmithWaterman( 
+                        cost, 
+                        frame.getFirstScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  
+                        frame.getSecondScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(second), 
+                        frame); 
+                else if(type ==VisualisationType.NEEDLEMANWUNSCH)
+                new NeedlemanWunsch( 
+                        cost, 
+                        frame.getFirstScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  
+                        frame.getSecondScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(second), 
+                        frame);
+                
+                dialog.dispose();
+            }
+            
+            //public void keyPressed(KeyEvent e) { System.out.println( "tester"); }
+        });
+
+        dialog.setVisible(true);
+    }
+    
+    
 }

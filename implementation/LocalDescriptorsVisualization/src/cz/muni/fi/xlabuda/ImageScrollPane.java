@@ -903,6 +903,7 @@ public class ImageScrollPane extends JPanel {
         LocalDescriptors descriptors = imagePanel.getDescriptors();
         if (descriptors != null) {
             Dialogs.scaleFilterDialog(this, descriptors);
+            getImagePanel().getDescriptors().recalculateVisualization();
         }
     }
 

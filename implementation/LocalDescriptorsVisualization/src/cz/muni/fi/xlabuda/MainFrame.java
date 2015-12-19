@@ -2,6 +2,7 @@ package cz.muni.fi.xlabuda;
 //BP TEXT: https://www.overleaf.com/3865085rdmxcj
 import com.sun.java.accessibility.util.EventQueueMonitor;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
@@ -27,6 +28,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -53,9 +55,8 @@ import messif.objects.*;
 import messif.objects.nio.BinaryInput;
 import messif.objects.nio.BinarySerializator;
 import messif.objects.util.SequenceMatchingCost;
-import messif.objects.util.SortDimension;
-import messif.utility.ArrayResetableIterator;
-import messif.utility.ResetableIterator;
+
+
 
 /**
  *
@@ -69,18 +70,20 @@ public class MainFrame extends JFrame {
     //******************** Constants ********************//
     private int axis = 0;
     /** Main frame width in pixels */
-    protected static final int MAIN_FRAME_WIDTH = 650;
+    //protected static final int MAIN_FRAME_WIDTH = 650;
+    protected static final int MAIN_FRAME_WIDTH = 1200;
 
     /** Main frame height in pixels */
-    protected static final int MAIN_FRAME_HEIGHT = 335;
+    //protected static final int MAIN_FRAME_HEIGHT = 335;
+    protected static final int MAIN_FRAME_HEIGHT = 500;
     
-    protected static final int MAIN_FRAME_MINIMUM_WIDTH = 400;
+    protected static final int MAIN_FRAME_MINIMUM_WIDTH = 480;
     protected static final int MAIN_FRAME_MINIMUM_HEIGHT =  360;
 
     public static final int FIRST_IMAGE_PANEL = 1;
     public static final int SECOND_IMAGE_PANEL = 2;
     
-    public enum VisualisationType {PRVA, NEEDLEMANWUNSCH, SMITHWATERMAN};
+    public enum VisualisationType {BRUTEFORCE, NEEDLEMANWUNSCH, SMITHWATERMAN};
     VisualisationType visualisationType;
     private Projection projection = null;
 
@@ -128,6 +131,7 @@ public class MainFrame extends JFrame {
     
     private JMenu projectionMenu; //moje
     private JMenu projectionFirstImage;
+    private JMenuItem projectionLineColor;
     private JMenu projectionSecondImage;
     private JMenuItem projectionFirstImageToX;
     private JMenuItem projectionFirstImageToY;
@@ -234,6 +238,8 @@ public class MainFrame extends JFrame {
     
     private JDialog ComputeVisualizationDialog = null;
     private JProgressBar ComputeVisualizationProgressBar = null;
+    SequenceMatchingCost cost = null;
+    Color defaultProjectionColor = Color.red;
 
     /**
      * Create new instance of MainFrame and initialize the components for the frame
@@ -294,6 +300,7 @@ public class MainFrame extends JFrame {
         projectionMenu = new JMenu();
         projectionFirstImage = new JMenu();
         projectionSecondImage = new JMenu();
+        projectionLineColor = new JMenuItem();
         projectionFirstImageToX = new JRadioButtonMenuItem();
         projectionFirstImageToY = new JRadioButtonMenuItem();
         projectionSecondImageToX = new JRadioButtonMenuItem();
@@ -654,7 +661,7 @@ public class MainFrame extends JFrame {
         showSimilarDescriptors.setText(localLanguage.getString("mb_show_similar"));
         showSimilarDescriptors.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                visualisationType = VisualisationType.PRVA;
+                visualisationType = VisualisationType.BRUTEFORCE;
                 Dialogs.tresholdDialog(thisInstance, true);
             }
         });
@@ -727,22 +734,29 @@ public class MainFrame extends JFrame {
         projectionFirstImage.setText("First Image");
         projectionSecondImage.setText("Second Image");
         
+        projectionLineColor.setText("Line Color");
+        projectionLineColor.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+                Color newColor = JColorChooser.showDialog(
+                     thisInstance, "asd",
+                     defaultProjectionColor);
+        if (newColor != null) {
+            defaultProjectionColor = newColor;
+           ((ProjectionGlassPane)getGlassPane()).setHooverColor(newColor);
+        }
+            }
+        
+        
+        });
+        
+        
+ 
+        
          smithWatermanButton.setText("SmithWaterman");
          smithWatermanButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
                 if(bothProjectionsSet()){
-                    setProjectionGlassPane();
-                    setVisualisationType(2);
-                    
-                    Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-                    Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-                    
-                    imageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
-                    secondImageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
-                    
-                    lockImagePanels(true);
-                    SmithWaterman smithWaterman = new SmithWaterman( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
-                       
+                    Dialogs.SequenceMatchingAlgorithmScrogingDialog(thisInstance, visualisationType.SMITHWATERMAN);
                 }
             }
         
@@ -752,41 +766,8 @@ public class MainFrame extends JFrame {
         needlemanWunschButton.setText("NeedlemanWunsch");
         needlemanWunschButton.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(ActionEvent event) {
-
                 if(bothProjectionsSet()){
-                    setProjectionGlassPane();
-                    setVisualisationType(1);
-                    
-                    Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-                    Set <ObjectFeature> second = secondImageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
-                    
-                    imageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
-                    secondImageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(true);
-                    
-                    
-                    lockImagePanels(true);
-                    NeedlemanWunsch needlemanWunsch = new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
-                    //setComparationMode(true);
-                    //needlemanWunsch.execute();
-                    
-                    if(true)return;
-                    List<ObjectFeature> result1 = null;
-                    List<ObjectFeature> result2 = null;
-                    result1 = needlemanWunsch.getFirstSequence();
-                    result2 = needlemanWunsch.getSecondSequence();
-                    
-                    setComparationMode(true);
-                    imageScrollPane.getBottomProjectionPanel().setData(result1);
-                    imageScrollPane.getSideProjectionPanel().setData(result1);
-                    secondImageScrollPane.getBottomProjectionPanel().setData(result2);
-                    secondImageScrollPane.getSideProjectionPanel().setData(result2);
-
-                    imageScrollPane.SetBottomProjectionPanelVisible();
-                    secondImageScrollPane.SetBottomProjectionPanelVisible();
-                    imageScrollPane.SetSideProjectionPanelInvisible();
-                    secondImageScrollPane.SetSideProjectionPanelInvisible();
-
-                    SetNWSWTotalSimilarity(needlemanWunsch.getSimilarity());   
+                    Dialogs.SequenceMatchingAlgorithmScrogingDialog(thisInstance, visualisationType.NEEDLEMANWUNSCH);
                 }
             }
         });
@@ -976,34 +957,9 @@ public class MainFrame extends JFrame {
         test.setText("test");
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                JTextArea msgLabel;
-                JProgressBar progressBar;
-                final int MAXIMUM = 100;
-                JPanel panel;
+               // ImageScrollPane.
 
-                progressBar = new JProgressBar(0, 100);
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(50);
-                msgLabel = new JTextArea("deneme");
-                msgLabel.setEditable(false);
-
-                panel = new JPanel(new BorderLayout(5, 5));
-                panel.add(msgLabel, BorderLayout.PAGE_START);
-                panel.add(progressBar, BorderLayout.CENTER);
-                panel.setBorder(BorderFactory.createEmptyBorder(11, 11, 11, 11));
-
-                JDialog dialog = new JDialog();
-                dialog.getContentPane().add(panel);
-                dialog.setResizable(false);
-                dialog.pack();
-                dialog.setSize(500, dialog.getHeight());
-                dialog.setLocationRelativeTo(null);
-                dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-                dialog.setAlwaysOnTop(false);
-                dialog.setVisible(true);
-                msgLabel.setBackground(panel.getBackground());
-                
-                dialog.dispose();
+//Dialogs.SequenceMatchingAlgorithmScrogingDialog(getMainFrame(), VisualisationType.SMITHWATERMAN);
             }
         });
 
@@ -1250,6 +1206,10 @@ public class MainFrame extends JFrame {
        // projectionMenu.add(projectionMenuX);
         projectionMenu.add(projectionFirstImage);
         projectionMenu.add(projectionSecondImage);
+        projectionMenu.add(new JSeparator());
+        projectionMenu.add(projectionLineColor);
+        
+        
         
         projectionFirstImage.add(projectionFirstImageToX);
         projectionFirstImage.add(projectionFirstImageToY);
@@ -1375,7 +1335,8 @@ public class MainFrame extends JFrame {
     }
 
     private void scaleFilterActionPerformed(ImageScrollPane pane) {
-        Dialogs.scaleFilterDialog(pane, pane.getImagePanel().getDescriptors());
+        Dialogs.scaleFilterDialog(pane, pane.getImagePanel().getDescriptors());    
+        pane.getImagePanel().getDescriptors().recalculateVisualization();
     }
 
     private void shapeSizeActionPerformed(LocalDescriptors descriptors) {
@@ -1874,7 +1835,7 @@ public class MainFrame extends JFrame {
     
     public void setProjectionGlassPane(){
      
-        projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane);
+        projectionGlassPane = new ProjectionGlassPane(imageScrollPane, secondImageScrollPane, defaultProjectionColor);
         setGlassPane(projectionGlassPane);
         projectionGlassPane.setEnabled(true);
         projectionGlassPane.setVisible(true);
@@ -1887,7 +1848,7 @@ public class MainFrame extends JFrame {
     
     public void setVisualisationType(int i){
         if (i ==0)
-        this.visualisationType = VisualisationType.PRVA;
+        this.visualisationType = VisualisationType.BRUTEFORCE;
         if (i == 1)
         this.visualisationType = VisualisationType.NEEDLEMANWUNSCH;
         if (i == 2)
@@ -1919,6 +1880,10 @@ public class MainFrame extends JFrame {
             return 0;
     }
     
+    public void setSequenceMatchingScoring(SequenceMatchingCost cost){
+        this.cost = cost;
+    }
+    
     public void RefreshVisualization(){
                     System.out.println("refresh command");
                     Set <ObjectFeature> first = imageScrollPane.getImagePanel().getDescriptors().getVisibleDescriptors();
@@ -1927,9 +1892,9 @@ public class MainFrame extends JFrame {
 
                     lockImagePanels(true);
                     if(visualisationType == VisualisationType.NEEDLEMANWUNSCH)
-                        new NeedlemanWunsch( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
+                        new NeedlemanWunsch(cost,  imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
                     else if(visualisationType == VisualisationType.SMITHWATERMAN)
-                        new SmithWaterman( imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
+                        new SmithWaterman(cost,  imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
                     //setComparationMode(true);
                     //needlemanWunsch.execute();
     }
