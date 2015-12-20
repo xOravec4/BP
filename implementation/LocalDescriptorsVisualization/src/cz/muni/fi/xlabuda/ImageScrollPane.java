@@ -777,6 +777,7 @@ public class ImageScrollPane extends JPanel {
         int yAxis = Double.valueOf(currentPosition.getY() + yShift).intValue();
 
         if (shiftDown) {
+            imagePanel.recalculateProjectionVisualization();
             imagePanel.removeRectangleForVisualization();
             if (imagePanel.getXPanelShift() - xShift >= 0) {
                 imagePanel.setXPanelShift((int) (imagePanel.getXPanelShift() - xShift));
@@ -919,6 +920,7 @@ public class ImageScrollPane extends JPanel {
         LocalDescriptors descriptors = imagePanel.getDescriptors();
         if (descriptors != null) {
             descriptors.setDefaultSettings();
+            imagePanel.recalculateProjectionVisualization();
         }
     }
     

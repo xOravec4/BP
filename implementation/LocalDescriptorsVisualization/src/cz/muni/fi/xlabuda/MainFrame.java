@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
@@ -224,6 +225,9 @@ public class MainFrame extends JFrame {
     private JLabel similarDescriptorsVisibleCountLabel;
     private JLabel NWSWTotalDescriptorsSimiliraty;
     private JLabel NWSWCurrentDescriptorSimiliraty;
+    private JButton NWSWMode1;
+    private JButton NWSWMode2;
+    private JButton NWSWMode3;
 
     private ImagePanel imagePanel;
     private ImageScrollPane imageScrollPane;
@@ -398,6 +402,9 @@ public class MainFrame extends JFrame {
         similarDescriptorsVisibleCountLabel = new JLabel();
         NWSWCurrentDescriptorSimiliraty = new JLabel();
         NWSWTotalDescriptorsSimiliraty = new JLabel();
+        NWSWMode1 = new JButton();
+        NWSWMode2 = new JButton();
+        NWSWMode3 = new JButton();
         
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -957,9 +964,7 @@ public class MainFrame extends JFrame {
         test.setText("test");
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-               // ImageScrollPane.
-
-//Dialogs.SequenceMatchingAlgorithmScrogingDialog(getMainFrame(), VisualisationType.SMITHWATERMAN);
+               revalidateProjection();
             }
         });
 
@@ -1059,6 +1064,51 @@ public class MainFrame extends JFrame {
                 Image.SCALE_SMOOTH);
         ImageIcon newTresholdIcon = new ImageIcon(newTresholdImage);
 
+        url = getClass().getResource("icons/nwswmode1.png");
+        ImageIcon nwswmode1Icon = new ImageIcon(url);
+        Image nwswmode1Image = nwswmode1Icon.getImage().getScaledInstance(ImageScrollPane.ICON_WIDTH,
+                ImageScrollPane.ICON_HEIGHT,
+                Image.SCALE_SMOOTH);
+        ImageIcon newNwswmode1Icon = new ImageIcon(nwswmode1Image);
+        
+        url = getClass().getResource("icons/nwswmode2.png");
+        ImageIcon nwswmode2Icon = new ImageIcon(url);
+        Image nwswmode2Image = nwswmode2Icon.getImage().getScaledInstance(ImageScrollPane.ICON_WIDTH,
+                ImageScrollPane.ICON_HEIGHT,
+                Image.SCALE_SMOOTH);
+        ImageIcon newNwswmode2Icon = new ImageIcon(nwswmode2Image);
+        
+        url = getClass().getResource("icons/nwswmode3.png");
+        ImageIcon nwswmode3Icon = new ImageIcon(url);
+        Image nwswmode3Image = nwswmode3Icon.getImage().getScaledInstance(ImageScrollPane.ICON_WIDTH,
+                ImageScrollPane.ICON_HEIGHT,
+                Image.SCALE_SMOOTH);
+        ImageIcon newNwswmode3Icon = new ImageIcon(nwswmode3Image);
+        
+        NWSWMode1.setIcon(newNwswmode1Icon);
+        NWSWMode1.setToolTipText("1");
+        NWSWMode1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ((ProjectionGlassPane)getGlassPane()).setVisualizationOneLine();
+            }
+        });
+        
+        NWSWMode2.setIcon(newNwswmode2Icon);
+        NWSWMode2.setToolTipText("2");
+        NWSWMode2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ((ProjectionGlassPane)getGlassPane()).setVisualizationThreeLines();
+            }
+        });
+        
+        NWSWMode3.setIcon(newNwswmode3Icon);
+        NWSWMode3.setToolTipText("3");
+        NWSWMode3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ((ProjectionGlassPane)getGlassPane()).setVisualizationHover();
+            }
+        });
+        
         hideGlasspaneButton.setIcon(newHideIcon);
         hideGlasspaneButton.setToolTipText(localLanguage.getString("hide_button"));
         hideGlasspaneButton.addActionListener(new java.awt.event.ActionListener() {
@@ -1110,6 +1160,9 @@ public class MainFrame extends JFrame {
         
         comparativePanelNWSW.add(NWSWTotalDescriptorsSimiliraty);
         comparativePanelNWSW.add(hideGlasspaneButton);
+        comparativePanelNWSW.add(NWSWMode1);
+        comparativePanelNWSW.add(NWSWMode2);
+        comparativePanelNWSW.add(NWSWMode3);
         comparativePanelNWSW.add(NWSWCurrentDescriptorSimiliraty);
 
         comparativePanel.add(similarDescriptorsTotalCountLabel);
@@ -1891,9 +1944,13 @@ public class MainFrame extends JFrame {
                     
 
                     lockImagePanels(true);
-                    if(visualisationType == VisualisationType.NEEDLEMANWUNSCH)
+                    //((ProjectionGlassPane)getGlassPane()).setPause(true);
+                    ((ProjectionGlassPane)getGlassPane()).setVisualizationHover();
+                    if(visualisationType == VisualisationType.NEEDLEMANWUNSCH){
                         new NeedlemanWunsch(cost,  imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
-                    else if(visualisationType == VisualisationType.SMITHWATERMAN)
+
+                    }
+                        else if(visualisationType == VisualisationType.SMITHWATERMAN)
                         new SmithWaterman(cost,  imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
                     //setComparationMode(true);
                     //needlemanWunsch.execute();
@@ -2041,5 +2098,15 @@ public class MainFrame extends JFrame {
         
     }
     
+    public int getMenuBarHeight(){
+        return menuBar.getHeight();
+    }
+    
+    public void asdsa(){
+        
+        MouseListener[] a = getMouseListeners();
+    }
+    
+
     
 }

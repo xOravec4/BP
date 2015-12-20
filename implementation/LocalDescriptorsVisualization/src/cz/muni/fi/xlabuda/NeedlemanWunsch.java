@@ -242,6 +242,7 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
         System.out.println("Second input size: " + list2.size());
                 
         mainFrame.ShowVisualizationProgressBar(list1.size());
+        /*
         for(int i=0;i<list1.size()-1;i++){
             if(true)break;
             if(list1.get(i).getX() == list1.get(i+1).getX()){
@@ -262,15 +263,15 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
                 System.out.println();
             }
 
-        }
-        
+        }*/
+        /*
         for(int i=0;i<list1.size()-1;i++){
             System.out.println("A: "+ list1.get(i));
             System.out.println("B: "+ list2.get(i));
             System.out.println();
         }
         System.out.println("PRINT TWO INPUT LISTS END");
-        
+        */
         
         int n = list1.size();       // length of this "string"
         int m = list2.size();       // length of o."string"
@@ -390,10 +391,16 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
 
         mainFrame.SetNWSWTotalSimilarity(similarity);
         
+        ((ProjectionGlassPane)mainFrame.getGlassPane()).setPause(false);
 
         
         //mainFrame.HideVisualizationProgressBar();
         return null;
+    }
+    
+    @Override
+    protected void done() {
+        
     }
     
     

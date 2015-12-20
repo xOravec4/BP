@@ -228,6 +228,12 @@ public List<ObjectFeature> getSortedProjection(Set<ObjectFeature> objFeatureList
                         values.add(i, entry.getValue()); 
                         break;   
                         }
+                        if(i==keys.size()-1){
+                            keys.add( entry.getKey());
+                            values.add( entry.getValue());
+                            //System.out.println("GAMA");
+                            break;
+                        }
                         continue;
                     }
                     

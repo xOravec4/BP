@@ -297,7 +297,8 @@ public final class ImagePanel extends JPanel {
                     } else {
                         getParentImageScrollPane().getParentMainFrame().repaintAll();
                     }
-                    recalculateProjectionVisualization();
+                    //System.out.println("P PF");
+                    //recalculateProjectionVisualization();
                 }
 
                 // Start move image in panel
@@ -318,8 +319,15 @@ public final class ImagePanel extends JPanel {
                             
                 }
                 projectionPointMoving = ProjectionPointMoving.NONE;
+                 
+                
+                if(e.getButton() == MouseEvent.BUTTON2 && !gettingRectangle){
+                    System.out.println("CLICLED ASRGASD"); 
+                    recalculateProjectionVisualization();
+                }
                 
                 if (e.isAltDown() && gettingRectangle && !e.isControlDown() && !e.isShiftDown()) {
+                    
                     if (rectangleEndPoint.getX() - rectangleStartPoint.getX() > 6 &&
                         rectangleEndPoint.getY() - rectangleStartPoint.getY() > 6) {
                             descriptors.setRectangleForVisualization(new Rectangle(
@@ -336,6 +344,8 @@ public final class ImagePanel extends JPanel {
                         rectangleStartPoint = null;
                         rectangleEndPoint = null;
                         rectangleFirstPoint = null;
+                        
+                            
                     }
                     if (frame.isShowSimilarDescriptorsMode()) {
                         ((GlasspaneForSimilarDescriptors) frame.getGlassPane()).
