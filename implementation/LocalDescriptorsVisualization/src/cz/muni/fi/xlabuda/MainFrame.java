@@ -3,6 +3,7 @@ package cz.muni.fi.xlabuda;
 import com.sun.java.accessibility.util.EventQueueMonitor;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
@@ -10,6 +11,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowEvent;
@@ -44,6 +47,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import messif.objects.impl.ObjectFeature;
@@ -84,8 +88,8 @@ public class MainFrame extends JFrame {
     public static final int FIRST_IMAGE_PANEL = 1;
     public static final int SECOND_IMAGE_PANEL = 2;
     
-    public enum VisualisationType {BRUTEFORCE, NEEDLEMANWUNSCH, SMITHWATERMAN};
-    VisualisationType visualisationType;
+    public enum VisualisationType {BRUTEFORCE, NEEDLEMANWUNSCH, SMITHWATERMAN, NONE};
+    VisualisationType visualisationType = VisualisationType.NONE;
     private Projection projection = null;
 
 
@@ -135,6 +139,7 @@ public class MainFrame extends JFrame {
     private JMenuItem projectionLineColor;
     private JMenu projectionSecondImage;
     private JMenuItem projectionFirstImageToX;
+    
     private JMenuItem projectionFirstImageToY;
     private JMenuItem projectionSecondImageToX;
     private JMenuItem projectionSecondImageToY;
@@ -260,6 +265,8 @@ public class MainFrame extends JFrame {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch(Exception e) { }
+        
+        
 
         localLanguage = ResourceBundle.getBundle("MainFrame", locale);
         menuBar = new JMenuBar();
@@ -964,7 +971,41 @@ public class MainFrame extends JFrame {
         test.setText("test");
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-               revalidateProjection();
+                
+               System.out.println("Creating 1");
+ 
+                final int MAXIMUM = 100;
+                JPanel panel;
+                //JDialog panel;
+                //ComputeVisualizationDialog.dispose();
+                
+                ComputeVisualizationDialog = new JDialog();
+                ComputeVisualizationProgressBar = new JProgressBar(0, 10);
+                ComputeVisualizationProgressBar.setIndeterminate(true);
+                //ComputeVisualizationProgressBar.setValue(50);
+                JLabel msgLabel = new JLabel();
+                msgLabel.setText("Computing similarity...");
+
+                panel = new JPanel(new BorderLayout(5, 5));
+                panel.add(msgLabel, BorderLayout.PAGE_START);
+                panel.add(ComputeVisualizationProgressBar, BorderLayout.CENTER);
+                panel.setBorder(BorderFactory.createEmptyBorder(11, 11, 11, 11));
+
+                
+                //ComputeVisualizationDialog.getContentPane().add(panel);
+                ComputeVisualizationDialog.setResizable(false);
+                //ComputeVisualizationDialog.pack();
+                ComputeVisualizationProgressBar.setIndeterminate(false);
+                ComputeVisualizationDialog.setSize(500, ComputeVisualizationDialog.getHeight());
+                ComputeVisualizationDialog.setLocationRelativeTo(thisInstance);
+                ComputeVisualizationDialog.setModal(true);
+                //ComputeVisualizationDialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL );
+                //ComputeVisualizationDialog.setAlwaysOnTop(true);
+                
+                //ComputeVisualizationDialog.setUndecorated(true);
+                ComputeVisualizationDialog.setVisible(true);
+                msgLabel.setBackground(panel.getBackground());
+                System.out.println("Creating DONE");
             }
         });
 
@@ -1261,6 +1302,7 @@ public class MainFrame extends JFrame {
         projectionMenu.add(projectionSecondImage);
         projectionMenu.add(new JSeparator());
         projectionMenu.add(projectionLineColor);
+        projectionLineColor.setEnabled(false);
         
         
         
@@ -1338,6 +1380,31 @@ public class MainFrame extends JFrame {
 
         pack();
         setVisible(true);
+        
+        //keybindings
+        KeyStroke ctrlX = KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK );
+        projectionFirstImageToX.setAccelerator(ctrlX);
+        
+        KeyStroke ctrlY = KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK );
+        projectionFirstImageToY.setAccelerator(ctrlY);
+        
+        KeyStroke ctrlL = KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK );
+        projectionFirstImageCustom.setAccelerator(ctrlL);
+        
+        KeyStroke altX = KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.ALT_DOWN_MASK );
+        projectionSecondImageToX.setAccelerator(altX);
+        
+        KeyStroke altY = KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.ALT_DOWN_MASK );
+        projectionSecondImageToY.setAccelerator(altY);
+        
+        KeyStroke altL = KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.ALT_DOWN_MASK );
+        projectionSecondImageCustom.setAccelerator(altL);
+        
+        KeyStroke f1 = KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0);
+        oneImageModeItem.setAccelerator(f1);
+        
+        KeyStroke f2 = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0 );
+        twoImagesModeItem.setAccelerator(f2);
     }
 
     
@@ -1511,6 +1578,7 @@ public class MainFrame extends JFrame {
         }
         if (imagePaneNumber == SECOND_IMAGE_PANEL) {
             projectionSecondImage.setEnabled(enabled);
+
         }
     }
     
@@ -1651,7 +1719,7 @@ public class MainFrame extends JFrame {
 
     public void setComparationMode(boolean turnedOn) {
         
-
+        
         
 
         
@@ -1659,19 +1727,21 @@ public class MainFrame extends JFrame {
                 visualisationType == VisualisationType.SMITHWATERMAN){
             
                 if(turnedOn){
+                    comparativePanelNWSW.add(hideGlasspaneButton, 1);
                     getContentPane().add(comparativePanelNWSW, BorderLayout.NORTH);
                     NWSWTotalDescriptorsSimiliraty.setText("Total similarity: NONE");
                     NWSWCurrentDescriptorSimiliraty.setText("Current two descriptors similarity: NONE");
                 }
                 else{
                     getContentPane().remove(comparativePanelNWSW);
+                    visualisationType = VisualisationType.NONE;
                 }
                 
                 imageScrollPane.EnableProjectionPanelsToggling(turnedOn);
                 secondImageScrollPane.EnableProjectionPanelsToggling(turnedOn);
                 hideSimilarDescriptors.setEnabled(turnedOn);
                 setTresholdItem.setEnabled(false);
-                setLinesColorItem.setEnabled(false);
+                setLinesColorItem.setEnabled(turnedOn);
                 setHooveredDescriptorColorItem.setEnabled(turnedOn);
                 antialiasingCheckboxItem.setEnabled(turnedOn);
             
@@ -1699,19 +1769,15 @@ public class MainFrame extends JFrame {
                     imageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(false);
                     secondImageScrollPane.getImagePanel().getDescriptors().setVisualizationMode(false);
                     
-
                     revalidate();
-                    
-                    //getGlassPane().setEnabled(false);
-                    //getGlassPane().setVisible(false);
-            
                 } 
-                
-                
-                
-                return;
+                  return;
         }
         
+        if(!turnedOn)
+            visualisationType = VisualisationType.NONE;
+        
+        //if bruteforce...
         imageScrollPane.resetProjection();
         secondImageScrollPane.resetProjection();
         
@@ -1723,6 +1789,7 @@ public class MainFrame extends JFrame {
             getGlassPane().setVisible(false);
         } else {
             if (!comparationMode) {
+                comparativePanel.add(hideGlasspaneButton, 2);
                 getContentPane().add(comparativePanel, BorderLayout.NORTH);
             }
         }
@@ -1734,7 +1801,9 @@ public class MainFrame extends JFrame {
             showSimilarDescriptors.setEnabled(false);
             needlemanWunschButton.setEnabled(false);
             smithWatermanButton.setEnabled(false);
+            resetProjectionsBoth();
         } else {
+            resetProjectionsBoth();
             if (imageScrollPane.getImagePanel().getDescriptors() != null &&
                     secondImageScrollPane.getImagePanel().getDescriptors() != null) {
                 
@@ -1842,15 +1911,29 @@ public class MainFrame extends JFrame {
         revalidate();
     }
     
+    public void resetProjectionsBoth(){
+        resetProjection(imageScrollPane);
+        resetProjection(secondImageScrollPane);
+        projectionLineColor.setEnabled(false);
+    }
     public void resetProjection(ImageScrollPane isp){
+        
+        if(isp.getImagePanel().getDescriptors() == null)
+            return;
+        if(isp.getImagePanel().getDescriptors().getProjectionType() == null)
+            return;
+
+        
+        if(!projectionSet(getOtherISP(isp))){
+            projectionLineColor.setEnabled(false);
+        }
         
         needlemanWunschButton.setEnabled(false);
         smithWatermanButton.setEnabled(false); 
                    
         ProjectionTo type = isp.getImagePanel().getDescriptors().getProjectionType();
         if( type == ProjectionTo.CUSTOM){
-            isp.getImagePanel().HideCustomProjectionPoints();
-            
+            isp.getImagePanel().HideCustomProjectionPoints();           
         }
         
         isp.EnableProjectionPanelsToggling(false);
@@ -1871,19 +1954,29 @@ public class MainFrame extends JFrame {
             projectionSecondImageCustom.setSelected(false);
             projectionResetSecondImage.setEnabled(false);
             projectionTogglePositionSecondImage.setEnabled(false);
+
         }
         
                 
         
     }
     
-    public boolean bothProjectionsSet(){
-        if(imageScrollPane.getImagePanel().getDescriptors() != null)
-            if(imageScrollPane.getImagePanel().getDescriptors().getProjectionType() != null)
-                if(secondImageScrollPane.getImagePanel().getDescriptors() != null)
-                    if(secondImageScrollPane.getImagePanel().getDescriptors().getProjectionType() != null)
-                        return true;
+    public ImageScrollPane getOtherISP(ImageScrollPane isp){
+        if(isp == imageScrollPane)
+            return secondImageScrollPane;
+        else
+            return imageScrollPane;
+    }
+    
+    public boolean projectionSet(ImageScrollPane isp){
+        if(isp.getImagePanel().getDescriptors() != null)
+            if(isp.getImagePanel().getDescriptors().getProjectionType() != null)
+                return true;
         return false;
+    }
+    
+    public boolean bothProjectionsSet(){
+        return projectionSet(imageScrollPane) && projectionSet(secondImageScrollPane);
     }
     
     public void setProjectionGlassPane(){
@@ -1908,12 +2001,7 @@ public class MainFrame extends JFrame {
         this.visualisationType = VisualisationType.SMITHWATERMAN;
     }
     
-    public ImageScrollPane getOtherISP(ImageScrollPane isp){
-        if(isp == imageScrollPane)
-            return secondImageScrollPane;
-        else
-            return imageScrollPane;
-    }
+
    
     public void SetNWSWTotalSimilarity(float a){
         NWSWTotalDescriptorsSimiliraty.setText("Total similarity: " + Float.toString(a));
@@ -1927,7 +2015,7 @@ public class MainFrame extends JFrame {
     }
     
     public int getComparativePanelNWSWHeight(){
-        if(comparativePanelNWSW.isVisible())
+        if(comparativePanelNWSW.isVisible() && (visualisationType == VisualisationType.NEEDLEMANWUNSCH || visualisationType == VisualisationType.SMITHWATERMAN))
             return comparativePanelNWSW.getHeight();
         else
             return 0;
@@ -1944,8 +2032,8 @@ public class MainFrame extends JFrame {
                     
 
                     lockImagePanels(true);
-                    //((ProjectionGlassPane)getGlassPane()).setPause(true);
-                    ((ProjectionGlassPane)getGlassPane()).setVisualizationHover();
+                    ((ProjectionGlassPane)getGlassPane()).setPause(true);
+                    ((ProjectionGlassPane)getGlassPane()).set(null,0,0,null);
                     if(visualisationType == VisualisationType.NEEDLEMANWUNSCH){
                         new NeedlemanWunsch(cost,  imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
 
@@ -1987,7 +2075,8 @@ public class MainFrame extends JFrame {
                 ComputeVisualizationDialog.pack();
                 ComputeVisualizationProgressBar.setIndeterminate(false);
                 ComputeVisualizationDialog.setSize(500, ComputeVisualizationDialog.getHeight());
-                ComputeVisualizationDialog.setLocationRelativeTo(null);
+                ComputeVisualizationDialog.setLocationRelativeTo(thisInstance);
+                //ComputeVisualizationDialog.setModal(true);
                 ComputeVisualizationDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
                 ComputeVisualizationDialog.setAlwaysOnTop(true);
                 
@@ -1996,25 +2085,31 @@ public class MainFrame extends JFrame {
                 msgLabel.setBackground(panel.getBackground());
                 System.out.println("Creating DONE");
                 
+                thisInstance.setEnabled(false);
+                
     }
     
     public void setDataToVisualizationProgressBar(int current){
-            //System.out.println("SET");
+            
         //ComputeVisualizationProgressBar.setIndeterminate(false);
         ComputeVisualizationProgressBar.setValue(current);
+        /*
         if(current == ComputeVisualizationProgressBar.getMaximum()){
          ComputeVisualizationDialog.dispose();
         ComputeVisualizationDialog = null;
-        lockImagePanels(false);
+        
         System.out.println("Disposing");
-        }
+        }*/
 
     }
     
     public void HideVisualizationProgressBar(){
+        ComputeVisualizationDialog.setVisible(false);
         ComputeVisualizationDialog.dispose();
         ComputeVisualizationDialog = null;
-        lockImagePanels(false);
+        thisInstance.setEnabled(true);
+        thisInstance.toFront();
+        
         System.out.println("Disposing");
     }
     
@@ -2095,6 +2190,8 @@ public class MainFrame extends JFrame {
                     needlemanWunschButton.setEnabled(false);
                     smithWatermanButton.setEnabled(false); 
                 }
+                
+                projectionLineColor.setEnabled(true);
         
     }
     

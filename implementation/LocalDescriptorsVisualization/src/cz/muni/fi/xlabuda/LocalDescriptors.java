@@ -636,30 +636,7 @@ public abstract class LocalDescriptors {
         recalculateGlasspaneDescriptors();
     }
     
-    public final ObjectFeature getNearestDeasriptor(Point point){
-        
-        Set<ObjectFeature> nearestDescriptors = new HashSet<ObjectFeature>();
-        Iterator<ObjectFeature> iterator = visibleDescriptors.iterator();
-        Point descriptorPoint;
-        double shortestDistance = Double.MAX_VALUE;
-        double calculatedDistance;
-        ObjectFeature result = null;
-        
-         while (iterator.hasNext()) {
-            ObjectFeature descriptor = iterator.next();
-            descriptorPoint = getDescriptorPoint(descriptor);
-            calculatedDistance = Point.distance(descriptorPoint.getX(),
-                    descriptorPoint.getY(), point.getX(),point.getY());
-            if (calculatedDistance < shortestDistance) {
-                shortestDistance = calculatedDistance;
-                result = descriptor;
-            }
-        }
-         return result;
-         
-        
-
-    }
+ 
 
     /**
      * Set state as hiden to the nearest descriptors to the given point

@@ -149,13 +149,28 @@ public class Dialogs {
     }
 
     public static void similarDescriptorsColorChooserDialog(MainFrame frame) {
-        GlasspaneForSimilarDescriptors glasspane = (GlasspaneForSimilarDescriptors) frame.getGlassPane();
-        Color newColor = JColorChooser.showDialog(
-                     frame, localLanguage.getString("ccsd_title"),
-                     glasspane.getSimilarDescriptorsColor());
-        if (newColor != null) {
-            glasspane.setSimilarDescriptorsColor(newColor);
+        if(frame.getVisualizationType() == MainFrame.VisualisationType.NEEDLEMANWUNSCH ||
+                frame.getVisualizationType() == MainFrame.VisualisationType.SMITHWATERMAN){
+        
+            ProjectionGlassPane glasspane = (ProjectionGlassPane) frame.getGlassPane();
+            Color newColor = JColorChooser.showDialog(
+                    frame, localLanguage.getString("cchd_title"),
+                    glasspane.getLinesColor());
+            if (newColor != null) {
+                glasspane.setLinesColor(newColor);
+            }
+        
+        } else {
+            GlasspaneForSimilarDescriptors glasspane = (GlasspaneForSimilarDescriptors) frame.getGlassPane();
+            Color newColor = JColorChooser.showDialog(
+                    frame, localLanguage.getString("cchd_title"),
+                    glasspane.getSimilarDescriptorsColor());
+            if (newColor != null) {
+                glasspane.setSimilarDescriptorsColor(newColor);
+            }
+
         }
+        
     }
 
     public static void hooveredDescriptorColorChooserDialog(MainFrame frame) {
@@ -718,9 +733,6 @@ public class Dialogs {
         approveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                 float a = ((Double) matchApproximateSpinner.getValue()).floatValue();
-         System.out.println("dbl a: "+ a);
-         
 
                 frame.setProjectionGlassPane();
                 
@@ -728,12 +740,20 @@ public class Dialogs {
                      frame.setVisualisationType(VisualisationType.NEEDLEMANWUNSCH);
                 else if(type ==VisualisationType.SMITHWATERMAN)
                     frame.setVisualisationType(VisualisationType.SMITHWATERMAN);
+                
+                frame.getFirstScrollPane().getImagePanel().setXPanelShift(0);
+                frame.getSecondScrollPane().getImagePanel().setXPanelShift(0);
+                frame.getFirstScrollPane().getImagePanel().setYPanelShift(0);
+                frame.getSecondScrollPane().getImagePanel().setYPanelShift(0);
 
                 Set <ObjectFeature> first = frame.getFirstScrollPane().getImagePanel().getDescriptors().getVisibleDescriptors();
                 Set <ObjectFeature> second = frame.getSecondScrollPane().getImagePanel().getDescriptors().getVisibleDescriptors();
                 
                 frame.getFirstScrollPane().getImagePanel().getDescriptors().setVisualizationMode(true);
                 frame.getSecondScrollPane().getImagePanel().getDescriptors().setVisualizationMode(true);
+                
+                //frame.getFirstScrollPane().getImagePanel().lockProjectionPoints(true);
+                //frame.getSecondScrollPane().getImagePanel().lockProjectionPoints(true);
                 
                 frame.lockImagePanels(true);
                 
@@ -750,7 +770,8 @@ public class Dialogs {
                         240.0f);
                 
                 frame.setSequenceMatchingScoring(cost);
-
+                
+               // frame.ShowVisualizationProgressBar(first.size());
                 if(type ==VisualisationType.SMITHWATERMAN)
                 new SmithWaterman( 
                         cost, 
@@ -763,6 +784,8 @@ public class Dialogs {
                         frame.getFirstScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  
                         frame.getSecondScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(second), 
                         frame);
+                
+                
                 
                 dialog.dispose();
             }

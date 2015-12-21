@@ -777,6 +777,10 @@ public class ImageScrollPane extends JPanel {
         int yAxis = Double.valueOf(currentPosition.getY() + yShift).intValue();
 
         if (shiftDown) {
+            if(mainFrame.getVisualizationType() == MainFrame.VisualisationType.NEEDLEMANWUNSCH ||
+                    mainFrame.getVisualizationType() == MainFrame.VisualisationType.SMITHWATERMAN)
+                    return;
+            
             imagePanel.recalculateProjectionVisualization();
             imagePanel.removeRectangleForVisualization();
             if (imagePanel.getXPanelShift() - xShift >= 0) {
@@ -816,11 +820,14 @@ public class ImageScrollPane extends JPanel {
 
     private void openImageButtonActionPerformed() {
         int paneNumber;
+        
+        
         if (this.equals(mainFrame.getFirstScrollPane())) {
             paneNumber = MainFrame.FIRST_IMAGE_PANEL;
         } else {
             paneNumber = MainFrame.SECOND_IMAGE_PANEL;
         }
+        
         ImageFileChooser fileChooser = new ImageFileChooser(imagePanel, paneNumber);
     }
 

@@ -491,4 +491,16 @@ public class SmithWaterman extends SwingWorker<Void, Void>{
         
         return null;
     }
+    
+    @Override
+    protected void done() {
+        ((ProjectionGlassPane)mainFrame.getGlassPane()).setPause(false);
+        ((ProjectionGlassPane)mainFrame.getGlassPane()).setModeTwoImageVisualisation();
+        ((ProjectionGlassPane)mainFrame.getGlassPane()).setVisualizationOneLine();
+        
+        mainFrame.getFirstScrollPane().getImagePanel().setLock(false);
+        mainFrame.getSecondScrollPane().getImagePanel().setLock(false);
+        
+        mainFrame.HideVisualizationProgressBar();
+    }
 }

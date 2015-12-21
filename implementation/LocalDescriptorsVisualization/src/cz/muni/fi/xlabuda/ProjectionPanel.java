@@ -330,6 +330,8 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
     public ObjectFeature getDescriptorAt(int i){
         if(dataList == null)
             return null;
+        if(dataList.size()-1 <i && i >0)
+            return null;
         return dataList.get(i);
     }
     
@@ -381,7 +383,10 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
     }
     
     public List<ObjectFeature> getDataList(){
-        return new ArrayList<ObjectFeature>(dataList);
+        if(dataList != null)
+            return new ArrayList<ObjectFeature>(dataList);
+        else
+            return null;
     }
     
 

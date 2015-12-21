@@ -89,8 +89,13 @@ public class ImageFileChooser extends JDialog{
                     JOptionPane.showMessageDialog(this, localLanguage.getString("jop_err_msg"),
                         localLanguage.getString("jop_err_title"), JOptionPane.ERROR_MESSAGE);
                 } else {
+                    
                     // Clear flag of loaded image
                     if (imagePanel.getImage() != null) {
+                        if(imagePanel.getParentImageScrollPane().getParentMainFrame().getVisualizationType() != MainFrame.VisualisationType.NONE){
+                            imagePanel.getParentImageScrollPane().getParentMainFrame().setComparationMode(false);
+                            imagePanel.getParentImageScrollPane().getParentMainFrame().resetProjectionsBoth();
+                        }
                         ImageScrollPane scrollPane = (ImageScrollPane) 
                                 imagePanel.getParentImageScrollPane();
                         MainFrame mainFrame = scrollPane.getParentMainFrame();

@@ -36,6 +36,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import messif.objects.impl.ObjectFeature;
+import messif.objects.impl.ObjectFeatureSet;
 import messif.objects.util.SequenceMatchingCost;
 
 /**
@@ -53,11 +54,12 @@ public class ProjectionGlassPane extends JComponent {
 
     ImageScrollPane imageScrollPane;
     ImageScrollPane secondImageScrollPane;
-    ImageScrollPane activeImageScrollPane = imageScrollPane;
+    ImageScrollPane activeImageScrollPane;
     MainFrame mainFrame;
 
     private boolean antialiasing = false;
-    private Color descriptorColor = Color.RED;
+    private Color colorHover = Color.RED;
+    private Color colorLines = Color.YELLOW;
 
     private int pointSize = 5;
     private boolean showAll = false;
@@ -79,8 +81,9 @@ public class ProjectionGlassPane extends JComponent {
     public ProjectionGlassPane(ImageScrollPane imageScrollPane, ImageScrollPane secondImageScrollPane, Color color) {
         this.imageScrollPane = imageScrollPane;
         this.secondImageScrollPane = secondImageScrollPane;
+        activeImageScrollPane = imageScrollPane;
         mainFrame = imageScrollPane.getParentMainFrame();
-        descriptorColor = color;
+        colorHover = color;
         getParent();
         // super(null);
     }
@@ -103,14 +106,13 @@ public class ProjectionGlassPane extends JComponent {
 
     public void set(ObjectFeature descriptor, float value, java.awt.image.BufferedImage img) {
         
-        //mode = Mode.singleImageProjection;
+        mode = Mode.singleImageProjection;
         //visualizationMode = VisualizationMode.hover;
         this.descriptor = descriptor;
         this.value = value;
         this.img = img;
         
-        if(descriptor == null)
-            highlitedDescriptor = false;
+        System.out.println("GOT DATA");
         
         repaint();
 
@@ -213,7 +215,7 @@ public class ProjectionGlassPane extends JComponent {
         imageScrollPane.getParentMainFrame().repaint();
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(descriptorColor);
+        g2d.setColor(colorLines);
         g2d.setStroke(new BasicStroke(1.5f));
         g2d.drawString("Glasspane", 0, 20);
 
@@ -232,6 +234,8 @@ public class ProjectionGlassPane extends JComponent {
             if (mode == Mode.twoImageVisualization && (visualizationMode == VisualizationMode.threeLines || visualizationMode== VisualizationMode.oneLine)) {
                 //activeImageScrollPane = imageScrollPane;
                 firstDataList = activeImageScrollPane.getBottomProjectionPanel().getDataList();
+                if(firstDataList == null)
+                    return;
                 if(highlitedDescriptor){
                         firstDataList.add(descriptor);
                 }
@@ -244,8 +248,8 @@ public class ProjectionGlassPane extends JComponent {
                 ObjectFeature _descriptor = firstDataList.get(j);
                 
                 if(j == firstDataList.size() -1 && highlitedDescriptor){
-                    g2d.setColor(Color.GREEN);
-                    g2d.setStroke(new BasicStroke(3.5f));
+                    g2d.setColor(colorHover);
+                    g2d.setStroke(new BasicStroke(2));
                 }
                 
                 if(_descriptor == null){
@@ -260,6 +264,8 @@ public class ProjectionGlassPane extends JComponent {
                     
                 
                 if (mode == Mode.singleImageProjection) {
+                    g2d.setColor(colorHover);
+                    
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     if (!isInViewPort(_descriptor, activeImageScrollPane)) {
                         //System.err.println("NOT IN VIEWPORT");
@@ -286,7 +292,7 @@ public class ProjectionGlassPane extends JComponent {
                          }*/
                         g2d.drawLine((int) descPos.getX(),
                                 (int) descPos.getY(),
-                                10 + getSecondPaneAlligment(activeImageScrollPane) + +pointSize / 2,
+                                10 + getSecondPaneAlligment(activeImageScrollPane) +pointSize / 2,
                                 //(int) value + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22 + + pointSize/2
                                 (int) value + activeImageScrollPane.getScrollPane().getLocation().y + activeImageScrollPane.getParentMainFrame().getMenuBarHeight() + pointSize / 2
                         );
@@ -305,11 +311,11 @@ public class ProjectionGlassPane extends JComponent {
                                     (int) activeImageScrollPane.getBottomProjectionPanel().getDescriptorValueAt(_descriptor) + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
                                     imageScrollPane.getHeight() + 5 + +imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
                             );
-                        } else {
+                        } else if(activeImageScrollPane.getSideProjectionPanel().isVisible()){
                             g2d.drawLine((int) descPos.getX(),
                                     (int) descPos.getY(),
-                                    10 + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
-                                    (int) activeImageScrollPane.getBottomProjectionPanel().getDescriptorValueAt(_descriptor) + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22 + +imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
+                                    10 + getSecondPaneAlligment(activeImageScrollPane) +pointSize / 2,
+                                    (int) activeImageScrollPane.getSideProjectionPanel().getDescriptorValueAt(_descriptor) + activeImageScrollPane.getScrollPane().getLocation().y + activeImageScrollPane.getParentMainFrame().getMenuBarHeight() + pointSize / 2 + + mainFrame.getComparativePanelNWSWHeight()
                             );
                         }
                         return;
@@ -336,8 +342,8 @@ public class ProjectionGlassPane extends JComponent {
                                 //System.out.println("b");
                                 g2d.drawLine((int) descPos.getX(),
                                         (int) descPos.getY(),
-                                        10 + imageScrollPane.getScrollPane().getX() + getSecondPaneAlligment(activeImageScrollPane),
-                                        (int) activeImageScrollPane.getBottomProjectionPanel().getDescriptorValueAt(_descriptor) + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22 + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
+                                        10 + getSecondPaneAlligment(activeImageScrollPane) +pointSize / 2,
+                                        (int) activeImageScrollPane.getSideProjectionPanel().getDescriptorValueAt(_descriptor) + activeImageScrollPane.getScrollPane().getLocation().y + activeImageScrollPane.getParentMainFrame().getMenuBarHeight() + pointSize / 2 + + mainFrame.getComparativePanelNWSWHeight()
                                 );
                             }
 
@@ -355,13 +361,13 @@ public class ProjectionGlassPane extends JComponent {
                             }
 
                         } else if (getOtherISP(activeImageScrollPane).getSideProjectionPanel().isVisible()) {
-                            int value2 = getOtherISP(activeImageScrollPane).getBottomProjectionPanel().getDescriptorValueAt(descriptor2);
+                            int value2 = getOtherISP(activeImageScrollPane).getSideProjectionPanel().getDescriptorValueAt(descriptor2);
                             // System.out.println("d");
                             if ((isInViewPort(descriptor2, getOtherISP(activeImageScrollPane)))) {
                                 g2d.drawLine((int) descPos2.getX(),
                                         (int) descPos2.getY(),
-                                        10 + getSecondPaneAlligment(getOtherISP(activeImageScrollPane)),
-                                        (int) value2 + activeImageScrollPane.getScrollPane().getY() + activeImageScrollPane.getY() + 22 + imageScrollPane.getParentMainFrame().getComparativePanelNWSWHeight()
+                                        10  +pointSize / 2 + getSecondPaneAlligment(getOtherISP(activeImageScrollPane)),
+                                        (int) value2 + activeImageScrollPane.getScrollPane().getLocation().y + activeImageScrollPane.getParentMainFrame().getMenuBarHeight() + pointSize / 2 + mainFrame.getComparativePanelNWSWHeight()
                                 );
                             }
 
@@ -452,11 +458,19 @@ public class ProjectionGlassPane extends JComponent {
     }
 
     public Color getHooverColor() {
-        return descriptorColor;
+        return colorHover;
+    }
+    
+    public Color getLinesColor() {
+        return colorLines;
     }
 
     public void setHooverColor(Color color) {
-        descriptorColor = color;
+        colorHover = color;
+    }
+    
+    public void setLinesColor(Color color) {
+        colorLines = color;
     }
     
     public void showAll(boolean bool){
@@ -471,32 +485,70 @@ public class ProjectionGlassPane extends JComponent {
     public void setVisualizationOneLine(){
         visualizationMode = VisualizationMode.oneLine;
         mode = Mode.twoImageVisualization;
-        activeImageScrollPane = imageScrollPane;
+        //activeImageScrollPane = imageScrollPane;
         repaint();
     }
     
     public void setVisualizationThreeLines(){
         visualizationMode = VisualizationMode.threeLines;
         mode = Mode.twoImageVisualization;
-        activeImageScrollPane = imageScrollPane;
+        //activeImageScrollPane = imageScrollPane;
         repaint();
     }
     
     public void setVisualizationHover(){
         visualizationMode = VisualizationMode.hover;
         mode = Mode.twoImageVisualization;
-        activeImageScrollPane = imageScrollPane;
+        //activeImageScrollPane = imageScrollPane;
         repaint();
     }
     
     public void setPause(boolean bool){
         pause = bool;
-        if(!bool){}
-            //repaint();
+
+            repaint();
     }
     
-    public void clicked(int x, int y){
+    public void setModeSingleImage(){
+        mode =Mode.singleImageProjection;
+    }
+    
+    public void setModeTwoImageVisualisation(){
+        mode = Mode.twoImageVisualization;
+    }
+    
+    public void highlightDescriptor(Point2D point, ImageScrollPane isp, int max_distance){
         
+        
+        
+        ObjectFeatureSet visibleDescriptors = isp.getImagePanel().getDescriptors().getDescriptors();
+        Set<ObjectFeature> nearestDescriptors = new HashSet<ObjectFeature>();
+        
+        Iterator<ObjectFeature> iterator = visibleDescriptors.iterator();
+        Point descriptorPoint;
+        double shortestDistance = max_distance;
+        double calculatedDistance;
+        ObjectFeature result = null;
+        
+         while (iterator.hasNext()) {
+            ObjectFeature descriptor = iterator.next();
+            descriptorPoint = isp.getImagePanel().getDescriptors().getDescriptorPoint(descriptor);
+            calculatedDistance = Point.distance(descriptorPoint.getX(),
+                    descriptorPoint.getY(), point.getX(),point.getY());
+            if (calculatedDistance < shortestDistance) {
+                int index = isp.getBottomProjectionPanel().getDescriptorIndex(descriptor);
+                if(index != -1){
+                    if(getOtherISP(isp).getBottomProjectionPanel().getDescriptorAt(index) != null){
+                        shortestDistance = calculatedDistance;
+                        result = descriptor;
+                        
+                    }
+                }
+                
+            }
+        }
+            setActivePanel(isp);
+            set(result, 0, 0, null);
     }
     
 }

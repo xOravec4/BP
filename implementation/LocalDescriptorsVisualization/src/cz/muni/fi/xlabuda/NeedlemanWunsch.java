@@ -391,7 +391,7 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
 
         mainFrame.SetNWSWTotalSimilarity(similarity);
         
-        ((ProjectionGlassPane)mainFrame.getGlassPane()).setPause(false);
+        
 
         
         //mainFrame.HideVisualizationProgressBar();
@@ -400,7 +400,16 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
     
     @Override
     protected void done() {
+        ((ProjectionGlassPane)mainFrame.getGlassPane()).setPause(false);
+        ((ProjectionGlassPane)mainFrame.getGlassPane()).setModeTwoImageVisualisation();
+        ((ProjectionGlassPane)mainFrame.getGlassPane()).setVisualizationOneLine();
         
+        mainFrame.getFirstScrollPane().getImagePanel().setLock(false);
+        mainFrame.getSecondScrollPane().getImagePanel().setLock(false);
+        
+        
+        
+        mainFrame.HideVisualizationProgressBar();
     }
     
     
