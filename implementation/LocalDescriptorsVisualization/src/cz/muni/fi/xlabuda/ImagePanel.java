@@ -14,8 +14,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JPanel;
 import messif.objects.impl.ObjectFeature;
 
@@ -237,6 +239,26 @@ public final class ImagePanel extends JPanel {
 
                 
                 MainFrame frame = getParentImageScrollPane().getParentMainFrame();
+                
+                if (frame.isShowSimilarDescriptorsMode() || true) {  
+                    ProjectionGlassPane gp = (ProjectionGlassPane) frame.getGlassPane();
+                    Point zoomedClickedPoint = e.getPoint();
+                    int x = Double.valueOf(zoomedClickedPoint.getX() / zoomScale).intValue();
+                    int y = Double.valueOf(zoomedClickedPoint.getY() / zoomScale).intValue();
+                    ObjectFeature desc = descriptors.getNearestDeasriptor(new Point(x, y));
+                    if(desc != null){
+                        gp.setActivePanel(getParentImageScrollPane());
+                        gp.set(desc, 0, 0, null);
+                         System.out.println("GP FOUND");
+                    }
+                    else
+                        System.out.println("NOT FOUND");
+
+                    
+                    System.out.println("GP CLICKED" + x + " " + y);
+                    return;
+                }
+                
                 if (frame.isShowSimilarDescriptorsMode()) {
                     GlasspaneForSimilarDescriptors glasspane =
                                 (GlasspaneForSimilarDescriptors) frame.getGlassPane();

@@ -471,18 +471,21 @@ public class ProjectionGlassPane extends JComponent {
     public void setVisualizationOneLine(){
         visualizationMode = VisualizationMode.oneLine;
         mode = Mode.twoImageVisualization;
+        activeImageScrollPane = imageScrollPane;
         repaint();
     }
     
     public void setVisualizationThreeLines(){
         visualizationMode = VisualizationMode.threeLines;
         mode = Mode.twoImageVisualization;
+        activeImageScrollPane = imageScrollPane;
         repaint();
     }
     
     public void setVisualizationHover(){
         visualizationMode = VisualizationMode.hover;
         mode = Mode.twoImageVisualization;
+        activeImageScrollPane = imageScrollPane;
         repaint();
     }
     
@@ -490,6 +493,10 @@ public class ProjectionGlassPane extends JComponent {
         pause = bool;
         if(!bool){}
             //repaint();
+    }
+    
+    public void clicked(int x, int y){
+        
     }
     
 }
