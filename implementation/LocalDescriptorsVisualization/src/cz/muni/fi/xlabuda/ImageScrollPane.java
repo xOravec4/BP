@@ -1,33 +1,23 @@
 package cz.muni.fi.xlabuda;
  
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.io.IOException;
-import java.util.Iterator;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
-import messif.objects.LocalAbstractObject;
-import messif.objects.impl.ObjectFeature;
 import javax.swing.JFrame;
-import javax.swing.OverlayLayout;
 
 /**
  * Panel for for visualization of image with descriptors.
@@ -81,12 +71,10 @@ public class ImageScrollPane extends JPanel {
     private ProjectionPanel sideProjectionPanel;
     private JButton switchProjectionsPanels;
     
-    private int order;
     
     private JFrame glassTest = new JFrame("GlassPane");
 
-    public ImageScrollPane(ImagePanel imagePane, MainFrame frame, int order) {
-        this.order = order;
+    public ImageScrollPane(ImagePanel imagePane, MainFrame frame) {
         localLanguage = ResourceBundle.getBundle("ImageScrollPane", MainFrame.locale);
         mainFrame = frame;
         imagePanel = imagePane;
@@ -95,10 +83,7 @@ public class ImageScrollPane extends JPanel {
         sideProjectionPanel = new ProjectionPanel();
         switchProjectionsPanels = new JButton();
         
-        
-        
         topPanel = new JPanel();
-
         labelsPanel = new JPanel();
         northLabelPanel = new JPanel();
         southLabelPanel = new JPanel();
@@ -420,106 +405,16 @@ public class ImageScrollPane extends JPanel {
         
         
         setLayout(new BorderLayout());
-
         setDefaultLabels();
-
-        add(topPanel, BorderLayout.NORTH);  
-        
-        
+        add(topPanel, BorderLayout.NORTH);        
         add(scrollPane, BorderLayout.CENTER);
         add(sideProjectionPanel, BorderLayout.WEST);
         add(bottomProjectionPanel, BorderLayout.SOUTH);
         
         sideProjectionPanel.setVisible(false);
         bottomProjectionPanel.setVisible(false);
-      /*  JPanel back = new JPanel();
-        back.setLayout(new BorderLayout());
-        back.add(switchProjectionsPanels, BorderLayout.EAST);
-       
-        back.add(bottomProjectionPanel, BorderLayout.WEST);
-        add(back, BorderLayout.SOUTH );
-        */
-        // System.out.println("Height je: " + back.getSize().height);
-        /*
-        bottomProjectionPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-                public void mouseClicked(java.awt.event.MouseEvent evt) {
-                    System.out.println("mouseClicked");
-                }});
-        */
+     
         setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
-        
-       
-    
-        
-       /*
-        JPanel back = new JPanel();
-        
-        LayoutManager overlay = new OverlayLayout(back);
-        back.setLayout(overlay);
-       // back.setLayout(new OverlayLayout());
-        back.setBackground(Color.green); 
-        
-        JPanel front = new JPanel();
-        front.setLayout(new BorderLayout());
-        front.setBackground(Color.red);
-        front.add(scrollPane, BorderLayout.CENTER);
-        front.add(sideProjectionPanel, BorderLayout.WEST);
-        front.add(bottomProjectionPanel, BorderLayout.SOUTH );
-        front.setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
-        
-        ProjectionGlassPane glassPane = new ProjectionGlassPane();
-        
-        back.add(front, BorderLayout.CENTER);
-        back.add(glassPane, BorderLayout.WEST);
-        
-        
-        
-        add(back);*/
-        /////////////*  /*
-        /*
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setLayout(new BorderLayout());
-        //layeredPane.setBackground(Color.green);
-        //layeredPane.setPreferredSize(new Dimension(200, 200));
-        
-        JPanel front = new JPanel();
-        front.setLayout(new BorderLayout());
-        
-        front.setBounds(0, 0, 100, 100);
-        front.setBackground(Color.red);
-        front.add(scrollPane, BorderLayout.CENTER);
-        front.add(sideProjectionPanel, BorderLayout.WEST);
-        front.add(bottomProjectionPanel, BorderLayout.SOUTH );
-        front.setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
-        
-        ProjectionGlassPane glassPane = new ProjectionGlassPane();
-        glassPane.setBackground( new Color(Color.TRANSLUCENT) );
-        glassPane.setOpaque(false);
-        glassPane.setBounds(50, 50, 100, 100);
-        
-        layeredPane.add(front, new Integer(1));
-        layeredPane.add(glassPane, new Integer(2));
-        
-        add(layeredPane);
-        */////////////
-
-        /*
-        
-        JPanel panel = new JPanel();
-
-       
-        panel.setLayout(new BorderLayout());
-        panel.add(topPanel, BorderLayout.NORTH);        
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(sideProjectionPanel, BorderLayout.WEST);
-        panel.add(bottomProjectionPanel, BorderLayout.SOUTH );
-        panel.setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
-        add(panel);
-        */
-     //   glassTest.setBackground(Color.GREEN);
-        
-
-       // add(glassTest);
         
     }
 
@@ -941,10 +836,7 @@ public class ImageScrollPane extends JPanel {
         return sideProjectionPanel;
     }
     
-    public int getOrder(){
-        return order;
-    }
-    
+
     public void ToggleSideProjectionPanel(){
         if(sideProjectionPanel.isVisible()){
             sideProjectionPanel.setVisible(false);

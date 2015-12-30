@@ -17,10 +17,6 @@ import javax.swing.JPanel;
 import messif.objects.impl.ObjectFeature;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.border.Border;
 
 /**
  *
@@ -68,12 +64,12 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
              
              public void mouseExited(MouseEvent e) {
                  if(dataList != null ){
-                    getProjectionGlassPane().set(null, 0,0, null);
+                    getProjectionGlassPane().setHooveredComparisonDescriptor(null);
                     System.out.println("Setting out dataList");
                     return;
                 }
                 else if(dataMap != null ){
-                    getProjectionGlassPane().set(null,0, null);
+                    getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
                     System.out.println("Setting out dataMap");
                     return;
                 }
@@ -235,7 +231,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                     float value = this.getWidth() * valuee;
                     if (  e.getX() >= value && e.getX() <= value +pointSize) {
                         getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                        getProjectionGlassPane().set(key, value, getParentImageScrollPane().getImagePanel().getImage());
+                        getProjectionGlassPane().setHooveredProjectionDescriptor(key, value);
                         return;
                     }
                 }
@@ -262,7 +258,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                       if(dataList.get(i) == null)
                           continue;
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().set(dataList.get(i), a, i, getParentImageScrollPane().getImagePanel().getImage());
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));
                       return;
                   }
                 }
@@ -270,7 +266,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                     float a =  ((float) i * step);
                     if (  e.getX() >= a && e.getX() <= a + pointSize) {
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().set(dataList.get(i), a, i, getParentImageScrollPane().getImagePanel().getImage());
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));
                       return;
                   }
                 }
@@ -287,7 +283,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                     //getProjectionGlassPane().setProjectionPanelPosition("top");
                     //getProjectionGlassPane().setActivePanel(getParentImageScrollPane().getOrder());
                     getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                    getProjectionGlassPane().set(key, value, getParentImageScrollPane().getImagePanel().getImage());  
+                    getProjectionGlassPane().setHooveredProjectionDescriptor(key, value);  
                     return;
                 }
             }
@@ -299,7 +295,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                   if (  e.getY() >= a && e.getY() <= a + pointSize) {
                       
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().set(dataList.get(i), a, i, getParentImageScrollPane().getImagePanel().getImage());                      
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));                      
                       return;
                   }
                 }
@@ -309,17 +305,17 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
         }
         
         if(dataList != null ){
-            getProjectionGlassPane().set(null, 0,0, null);
+            getProjectionGlassPane().setHooveredComparisonDescriptor(null);
             System.out.println("Setting out dataList");
             return;
         }
         else if(dataMap != null ){
-            getProjectionGlassPane().set(null,0, null);
+            getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
             System.out.println("Setting out dataMap");
             return;
         }
         
-        getProjectionGlassPane().set(null,0, null);
+        getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
         System.out.println("Setting out dataMap");
         
         

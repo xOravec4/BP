@@ -352,78 +352,9 @@ public class SmithWaterman extends SwingWorker<Void, Void>{
         }
         similarity = max;
         
-        
-
-        boolean horizontally = false;
-        boolean vertically = false;
         result1.add(list1.get(topIndex-1));
         result2.add(list2.get(sideIndex-1));
-        /*
-        while (H[sideIndex][topIndex] != 0){
-        System.out.println("H[sideIndex][topIndex] " + H[sideIndex][topIndex]);
 
-            /*            
-            if(topIndex == 1){
-                sideIndex--;
-                result1.add(null);
-                result2.add(list2.get(sideIndex-1)); 
-                vertically = true;
-                horizontally = false;
-                continue;
-            }
-            
-            if(sideIndex == 1){
-                topIndex--;
-                result1.add(list1.get(topIndex-1));
-                result2.add(null); 
-                vertically = false;
-                horizontally = true;
-                continue;
-            }*/
-        
-        
-        
-        /*
-            
-            int maxIndex = 1;
-            float c2 = Math.max(0, cost.getCost(list1.get(topIndex-1), list2.get(sideIndex-1)));
-            maxIndex = getMaxIndex(H[sideIndex-1][topIndex-1],H[sideIndex-1][topIndex] + cost.getGapOpening(), H[sideIndex][topIndex-1] + cost.getGapOpening());
-            /*
-            
-           if(vertically){
-                maxIndex = getMaxIndex(H[topIndex-1][sideIndex-1],H[topIndex-1][sideIndex] - cost.getGapContinue(), H[topIndex][sideIndex-1] - cost.getGapOpening());
-           }         
-           else if(horizontally){
-                maxIndex = getMaxIndex(H[topIndex-1][sideIndex-1],H[topIndex-1][sideIndex] - cost.getGapOpening(), H[topIndex][sideIndex-1] - cost.getGapContinue());
-           }
-           else{
-                maxIndex = getMaxIndex(H[topIndex-1][sideIndex-1],H[topIndex-1][sideIndex] - cost.getGapOpening(), H[topIndex][sideIndex-1] - cost.getGapOpening());
-           }*/
-            /*
-            if(maxIndex == 1){
-                topIndex--;
-                sideIndex--;
-                result1.add(list1.get(topIndex-1));
-                result2.add(list2.get(sideIndex-1)); 
-                continue;
-            }
-            if(maxIndex == 2){
-                topIndex--;
-                result1.add(list1.get(topIndex-1));
-                result2.add(null); 
-                System.out.println("a");
-                continue;
-            }
-            if(maxIndex == 3){
-                sideIndex--;
-                result1.add(null);
-                result2.add(list2.get(sideIndex-1)); 
-                System.out.println("b");
-                continue;
-            }
-            
-            
-        }*/
         
         while(H[sideIndex][topIndex]!= 0 && sideIndex > 1 && topIndex > 1){
         
@@ -444,14 +375,14 @@ public class SmithWaterman extends SwingWorker<Void, Void>{
                 //if(H[sideIndex-1][topIndex] < 0.01){break;}
                 topIndex--;
                 result1.add(list1.get(topIndex-1));
-                result2.add(null); 
+                result2.add(result2.size()-1, null); 
                 System.out.println("BACKTRACE 2 sideindex " + sideIndex);
                 continue;
             }
             if(maxIndex == 3){
                 //if(H[sideIndex][topIndex-1] < 0.01){break;}
                 sideIndex--;
-                result1.add(null);
+                result1.add(result2.size()-1, null);
                 result2.add(list2.get(sideIndex-1)); 
                 System.out.println("BACKTRACE 3 sideindex " + sideIndex);
                 continue;

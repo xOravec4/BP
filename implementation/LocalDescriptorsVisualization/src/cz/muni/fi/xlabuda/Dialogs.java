@@ -2,18 +2,14 @@ package cz.muni.fi.xlabuda;
 
 import cz.muni.fi.xlabuda.MainFrame.VisualisationType;
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javafx.scene.control.RadioButton;
-import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -614,29 +610,6 @@ public class Dialogs {
      }
      
      
-     public static void chooseVisualizationProjection(){
-         
-         final JPanel panel = new JPanel();
-                final JRadioButton button1 = new JRadioButton("Projection to X");
-                final JRadioButton button2 = new JRadioButton("Projection to Y");
-                final JLabel label = new JLabel();
-                label.setText("asdfdasdf");
-                panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-                panel.add(label);
-                ButtonGroup group = new ButtonGroup();
-                group.add(button1);
-                group.add(button2);
-                panel.add(button1);
-                panel.add(button2);
-
-                JOptionPane.showMessageDialog(null, panel, "No projection selected.",  JOptionPane.PLAIN_MESSAGE);
-                if(button1.isSelected()){
-                    System.out.println("1");
-                }
-                if(button2.isSelected()){
-                    System.out.println("2");
-                }
-     }
      
     public static void SequenceMatchingAlgorithmScrogingDialog(final MainFrame frame, final VisualisationType type) {
         if(type == VisualisationType.BRUTEFORCE)
@@ -716,9 +689,6 @@ public class Dialogs {
             spinnerPanel.add(row5);
         }
         
- 
-               
-        
         JButton approveButton = new JButton();
         approveButton.setText(localLanguage.getString("button"));
 
@@ -728,7 +698,6 @@ public class Dialogs {
 
         dialog = optionPane.createDialog(frame, "Choose scoring system");
 
-        
         
         approveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -752,14 +721,8 @@ public class Dialogs {
                 frame.getFirstScrollPane().getImagePanel().getDescriptors().setVisualizationMode(true);
                 frame.getSecondScrollPane().getImagePanel().getDescriptors().setVisualizationMode(true);
                 
-                //frame.getFirstScrollPane().getImagePanel().lockProjectionPoints(true);
-                //frame.getSecondScrollPane().getImagePanel().lockProjectionPoints(true);
-                
                 frame.lockImagePanels(true);
                 
-            
-
-        
                 SequenceMatchingCost cost = new SequenceMatchingCost(
                         ((Double) gapOpeningSpinner.getValue()).floatValue(), 
                         ((Double) gapContinueSpinner.getValue()).floatValue() , 
@@ -771,7 +734,6 @@ public class Dialogs {
                 
                 frame.setSequenceMatchingScoring(cost);
                 
-               // frame.ShowVisualizationProgressBar(first.size());
                 if(type ==VisualisationType.SMITHWATERMAN)
                 new SmithWaterman( 
                         cost, 
@@ -784,13 +746,10 @@ public class Dialogs {
                         frame.getFirstScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  
                         frame.getSecondScrollPane().getImagePanel().getDescriptors().getProjection().getSortedProjection(second), 
                         frame);
-                
-                
-                
+
                 dialog.dispose();
             }
             
-            //public void keyPressed(KeyEvent e) { System.out.println( "tester"); }
         });
 
         dialog.setVisible(true);

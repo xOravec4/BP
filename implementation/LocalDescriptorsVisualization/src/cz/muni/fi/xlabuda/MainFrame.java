@@ -76,11 +76,11 @@ public class MainFrame extends JFrame {
     private int axis = 0;
     /** Main frame width in pixels */
     //protected static final int MAIN_FRAME_WIDTH = 650;
-    protected static final int MAIN_FRAME_WIDTH = 1200;
+    protected static final int MAIN_FRAME_WIDTH = 600;
 
     /** Main frame height in pixels */
     //protected static final int MAIN_FRAME_HEIGHT = 335;
-    protected static final int MAIN_FRAME_HEIGHT = 500;
+    protected static final int MAIN_FRAME_HEIGHT = 400;
     
     protected static final int MAIN_FRAME_MINIMUM_WIDTH = 480;
     protected static final int MAIN_FRAME_MINIMUM_HEIGHT =  360;
@@ -396,11 +396,11 @@ public class MainFrame extends JFrame {
 
         imagePanel = new ImagePanel();
         imagePanel.setParentMainFrame(this);
-        imageScrollPane = new ImageScrollPane(imagePanel, this, 1);
+        imageScrollPane = new ImageScrollPane(imagePanel, this);
 
         secondImagePanel = new ImagePanel();
         secondImagePanel.setParentMainFrame(this);
-        secondImageScrollPane = new ImageScrollPane(secondImagePanel, this, 2);
+        secondImageScrollPane = new ImageScrollPane(secondImagePanel, this);
         
         hideGlasspaneButton = new JButton();
         antialiasButton = new JButton();
@@ -971,41 +971,7 @@ public class MainFrame extends JFrame {
         test.setText("test");
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                
-               System.out.println("Creating 1");
- 
-                final int MAXIMUM = 100;
-                JPanel panel;
-                //JDialog panel;
-                //ComputeVisualizationDialog.dispose();
-                
-                ComputeVisualizationDialog = new JDialog();
-                ComputeVisualizationProgressBar = new JProgressBar(0, 10);
-                ComputeVisualizationProgressBar.setIndeterminate(true);
-                //ComputeVisualizationProgressBar.setValue(50);
-                JLabel msgLabel = new JLabel();
-                msgLabel.setText("Computing similarity...");
-
-                panel = new JPanel(new BorderLayout(5, 5));
-                panel.add(msgLabel, BorderLayout.PAGE_START);
-                panel.add(ComputeVisualizationProgressBar, BorderLayout.CENTER);
-                panel.setBorder(BorderFactory.createEmptyBorder(11, 11, 11, 11));
-
-                
-                //ComputeVisualizationDialog.getContentPane().add(panel);
-                ComputeVisualizationDialog.setResizable(false);
-                //ComputeVisualizationDialog.pack();
-                ComputeVisualizationProgressBar.setIndeterminate(false);
-                ComputeVisualizationDialog.setSize(500, ComputeVisualizationDialog.getHeight());
-                ComputeVisualizationDialog.setLocationRelativeTo(thisInstance);
-                ComputeVisualizationDialog.setModal(true);
-                //ComputeVisualizationDialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL );
-                //ComputeVisualizationDialog.setAlwaysOnTop(true);
-                
-                //ComputeVisualizationDialog.setUndecorated(true);
-                ComputeVisualizationDialog.setVisible(true);
-                msgLabel.setBackground(panel.getBackground());
-                System.out.println("Creating DONE");
+                System.out.println("TYPE: " + visualisationType);
             }
         });
 
@@ -1827,7 +1793,7 @@ public class MainFrame extends JFrame {
         secondImageScrollPane.setDescriptorsLabels();
         
         if(!turnedOn)
-                    visualisationType = null;
+                    visualisationType = visualisationType.NONE;
         repaintAll();
     }
 
@@ -2033,7 +1999,7 @@ public class MainFrame extends JFrame {
 
                     lockImagePanels(true);
                     ((ProjectionGlassPane)getGlassPane()).setPause(true);
-                    ((ProjectionGlassPane)getGlassPane()).set(null,0,0,null);
+                    ((ProjectionGlassPane)getGlassPane()).setHooveredComparisonDescriptor(null);
                     if(visualisationType == VisualisationType.NEEDLEMANWUNSCH){
                         new NeedlemanWunsch(cost,  imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
 
