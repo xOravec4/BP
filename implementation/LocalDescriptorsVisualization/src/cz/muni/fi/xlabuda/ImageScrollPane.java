@@ -330,7 +330,7 @@ public class ImageScrollPane extends JPanel {
 
         scrollPane.getHorizontalScrollBar().addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(AdjustmentEvent e) {
-                if (mainFrame.isShowSimilarDescriptorsMode()) {
+                if (mainFrame.isBruteforceVisualizationMode()) {
                     GlasspaneForSimilarDescriptors glassPane =
                             (GlasspaneForSimilarDescriptors) mainFrame.getGlassPane();
                     glassPane.calculatePoints();
@@ -341,7 +341,7 @@ public class ImageScrollPane extends JPanel {
 
         scrollPane.getVerticalScrollBar().addAdjustmentListener(new java.awt.event.AdjustmentListener() {
             public void adjustmentValueChanged(AdjustmentEvent e) {
-                if (mainFrame.isShowSimilarDescriptorsMode()) {
+                if (mainFrame.isBruteforceVisualizationMode()) {
                     GlasspaneForSimilarDescriptors glassPane =
                             (GlasspaneForSimilarDescriptors) mainFrame.getGlassPane();
                     glassPane.calculatePoints();
@@ -547,11 +547,11 @@ public class ImageScrollPane extends JPanel {
 
             int visibleCount;
 
-            if (!mainFrame.isShowSimilarDescriptorsMode()) {
+            if (!mainFrame.isBruteforceVisualizationMode()) {
                 visibleCount = descriptors.getVisibleDescriptors().size();
                 visibleDescriptorsLabel.setText(
                     localLanguage.getString("descriptors_visible") + visibleCount);
-            } else {
+            } else if (mainFrame.isBruteforceVisualizationMode()) {
                 GlasspaneForSimilarDescriptors glasspane = 
                         (GlasspaneForSimilarDescriptors) mainFrame.getGlassPane();
                 if (mainFrame.getFirstScrollPane().equals(this)) {
@@ -764,7 +764,7 @@ public class ImageScrollPane extends JPanel {
 
     private void undoButtonActionPerformed() {
         LocalDescriptors descriptors = imagePanel.getDescriptors();
-        if (mainFrame.isShowSimilarDescriptorsMode()) {
+        if (mainFrame.isBruteforceVisualizationMode()) {
             ((GlasspaneForSimilarDescriptors) mainFrame.getGlassPane()).undoClickedSimilar();
         } else {
             if (descriptors != null) {
@@ -777,7 +777,7 @@ public class ImageScrollPane extends JPanel {
 
     private void redoButtonActionPerformed() {
         LocalDescriptors descriptors = imagePanel.getDescriptors();
-        if (mainFrame.isShowSimilarDescriptorsMode()) {
+        if (mainFrame.isBruteforceVisualizationMode()) {
             ((GlasspaneForSimilarDescriptors) mainFrame.getGlassPane()).redoClickedSimilar();
         } else {
             if (descriptors != null) {

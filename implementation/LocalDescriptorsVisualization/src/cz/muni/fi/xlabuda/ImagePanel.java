@@ -206,7 +206,7 @@ public final class ImagePanel extends JPanel {
                 if(lock)
                     return;
                 
-                if (frame.isShowSimilarDescriptorsMode()) {
+                if (frame.isBruteforceVisualizationMode()) {
                     Point nearestDescriptorsPoint = null;
                     double distance = Double.MAX_VALUE;
                     double currDistance;
@@ -256,13 +256,13 @@ public final class ImagePanel extends JPanel {
                     int x = Double.valueOf(zoomedClickedPoint.getX() / zoomScale).intValue();
                     int y = Double.valueOf(zoomedClickedPoint.getY() / zoomScale).intValue();
 
-                        gp.highlightDescriptor(new Point(x, y), getParentImageScrollPane(), 12);
+                        gp.highlightNearestDescriptor(new Point(x, y), getParentImageScrollPane(), 12);
 
                     System.out.println("GP CLICKED" + x + " " + y);
                     return;
                 }
                 
-                if (frame.isShowSimilarDescriptorsMode()) {
+                if (frame.isBruteforceVisualizationMode()) {
                     GlasspaneForSimilarDescriptors glasspane =
                                 (GlasspaneForSimilarDescriptors) frame.getGlassPane();
                     if (e.getButton() == MouseEvent.BUTTON3) {
@@ -322,7 +322,7 @@ public final class ImagePanel extends JPanel {
                         rectangleStartPoint != null && !gettingRectangle) {
                     removeRectangleForVisualization();
                     descriptors.setRectangleForVisualization(null);
-                    if (frame.isShowSimilarDescriptorsMode()) {
+                    if (frame.isBruteforceVisualizationMode()) {
                         ((GlasspaneForSimilarDescriptors) frame.getGlassPane()).recalculateDescriptors();
                     } else {
                         getParentImageScrollPane().getParentMainFrame().repaintAll();
@@ -380,7 +380,7 @@ public final class ImagePanel extends JPanel {
                         
                             
                     }
-                    if (frame.isShowSimilarDescriptorsMode()) {
+                    if (frame.isBruteforceVisualizationMode()) {
                         ((GlasspaneForSimilarDescriptors) frame.getGlassPane()).
                             recalculateDescriptors();
                     } else {
@@ -490,7 +490,7 @@ public final class ImagePanel extends JPanel {
      */
     public void zoom(double zoomScale) {
         if (image != null) {
-            if (getParentImageScrollPane().getParentMainFrame().isShowSimilarDescriptorsMode()) {
+            if (getParentImageScrollPane().getParentMainFrame().isBruteforceVisualizationMode()) {
                 GlasspaneForSimilarDescriptors glassPane = (GlasspaneForSimilarDescriptors)
                         getParentImageScrollPane().getParentMainFrame().getGlassPane();
                     glassPane.calculatePoints();
@@ -605,7 +605,6 @@ public final class ImagePanel extends JPanel {
         Graphics2D graphics2D = (Graphics2D) graphics;
         
 
-
         if (image != null) {
             graphics2D.transform(at);
 
@@ -613,17 +612,13 @@ public final class ImagePanel extends JPanel {
                     null);
 
             if (descriptors != null) {
-                if (!frame.getGlassPane().isVisible() || frame.getGlassPane().getClass() == ProjectionGlassPane.class ) { //UPRAVENE
                     if (descriptors.getDescriptorsReadyToDrawn()) {
                         descriptors.modifyGraphics(graphics2D);
                         descriptors.paint(graphics2D);
                     }
-                }
-                
-                
 
 
-                if (getParentImageScrollPane().getParentMainFrame().isShowSimilarDescriptorsMode()) {
+                if (getParentImageScrollPane().getParentMainFrame().isBruteforceVisualizationMode()) {
                     graphics2D.setStroke(new BasicStroke((float) (1 / zoomScale)));
                 }
                 

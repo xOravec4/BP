@@ -75,10 +75,7 @@ public class ProjectionGlassPane extends JComponent {
     public void setActivePanel(ImageScrollPane isp) {
         activeImageScrollPane = isp;
     }
-
-    public void test() {
-        System.out.println("working");
-    }
+    
 
     public void setHooveredProjectionDescriptor(ObjectFeature descriptor, float value ) {
         
@@ -415,7 +412,7 @@ public class ProjectionGlassPane extends JComponent {
         mode = Mode.twoImageVisualization;
     }
     
-    public void highlightDescriptor(Point2D point, ImageScrollPane isp, int max_distance){
+    public void highlightNearestDescriptor(Point2D point, ImageScrollPane isp, int max_distance){
         
         ObjectFeatureSet visibleDescriptors = isp.getImagePanel().getDescriptors().getDescriptors();
         Set<ObjectFeature> nearestDescriptors = new HashSet<ObjectFeature>();

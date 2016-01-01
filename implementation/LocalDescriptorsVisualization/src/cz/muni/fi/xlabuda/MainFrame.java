@@ -675,7 +675,6 @@ public class MainFrame extends JFrame {
         showSimilarDescriptors.setText(localLanguage.getString("mb_show_similar"));
         showSimilarDescriptors.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                visualisationType = VisualisationType.BRUTEFORCE;
                 Dialogs.tresholdDialog(thisInstance, true);
             }
         });
@@ -683,7 +682,7 @@ public class MainFrame extends JFrame {
         hideSimilarDescriptors.setText(localLanguage.getString("mb_hide_similar"));
         hideSimilarDescriptors.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setComparationMode(false);
+                setComparationMode(VisualisationType.NONE);
             }
         });
 
@@ -732,8 +731,10 @@ public class MainFrame extends JFrame {
         oneImageModeItem.setText(localLanguage.getString("mb_one_img"));
         oneImageModeItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
+                thisInstance.resetProjectionsBoth();
+                thisInstance.setComparationMode(VisualisationType.NONE);
                 oneImageModeComponents();
-                setComparationMode(false);
+
             }
         });
 
@@ -972,6 +973,9 @@ public class MainFrame extends JFrame {
         test.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 System.out.println("TYPE: " + visualisationType);
+                if(comparationMode)
+                    System.out.println("comparationMode " );
+                    
             }
         });
 
@@ -1120,7 +1124,7 @@ public class MainFrame extends JFrame {
         hideGlasspaneButton.setToolTipText(localLanguage.getString("hide_button"));
         hideGlasspaneButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setComparationMode(false);
+                setComparationMode(VisualisationType.NONE);
             }
         });
 
@@ -1644,7 +1648,7 @@ public class MainFrame extends JFrame {
             glasspane = (GlasspaneForSimilarDescriptors) getGlassPane();
             glasspane.setDistanceTreshold(minValue, maxValue);
         }
-        setComparationMode(true);
+        setComparationMode(VisualisationType.BRUTEFORCE);
     }
 
     /**
@@ -1683,9 +1687,15 @@ public class MainFrame extends JFrame {
     
     
 
-    public void setComparationMode(boolean turnedOn) {
+    public void setComparationMode(VisualisationType newType) {
         
+        boolean turnedOn = true;
         
+        if(newType == VisualisationType.NONE){
+            turnedOn = false;
+        }
+        else
+            visualisationType = newType;
         
 
         
@@ -1695,10 +1705,12 @@ public class MainFrame extends JFrame {
                 if(turnedOn){
                     comparativePanelNWSW.add(hideGlasspaneButton, 1);
                     getContentPane().add(comparativePanelNWSW, BorderLayout.NORTH);
+                    comparativePanelNWSW.setVisible(true);
                     NWSWTotalDescriptorsSimiliraty.setText("Total similarity: NONE");
                     NWSWCurrentDescriptorSimiliraty.setText("Current two descriptors similarity: NONE");
                 }
                 else{
+                    comparativePanelNWSW.setVisible(false);
                     getContentPane().remove(comparativePanelNWSW);
                     visualisationType = VisualisationType.NONE;
                 }
@@ -1740,8 +1752,9 @@ public class MainFrame extends JFrame {
                   return;
         }
         
-        if(!turnedOn)
-            visualisationType = VisualisationType.NONE;
+        //if(!turnedOn)
+            //visualisationType = VisualisationType.NONE;
+            //visualisationType = VisualisationType.NONE;
         
         //if bruteforce...
         imageScrollPane.resetProjection();
@@ -1789,16 +1802,24 @@ public class MainFrame extends JFrame {
         setHooveredDescriptorColorItem.setEnabled(turnedOn);
         antialiasingCheckboxItem.setEnabled(turnedOn);
 
+        if(!turnedOn)
+                    visualisationType = visualisationType.NONE;
+        
         imageScrollPane.setDescriptorsLabels();
         secondImageScrollPane.setDescriptorsLabels();
         
-        if(!turnedOn)
-                    visualisationType = visualisationType.NONE;
+        
         repaintAll();
     }
 
-    public boolean isShowSimilarDescriptorsMode() {
+    public boolean isShowSimilarDescriptorsModeOLD() {
         return comparationMode;
+    }
+    
+    public boolean isBruteforceVisualizationMode(){
+        if(visualisationType == visualisationType.BRUTEFORCE)
+            return true;
+        return false;
     }
 
     public JPanel getMainPanel() {
@@ -2006,7 +2027,7 @@ public class MainFrame extends JFrame {
                     }
                         else if(visualisationType == VisualisationType.SMITHWATERMAN)
                         new SmithWaterman(cost,  imageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(first),  secondImageScrollPane.getImagePanel().getDescriptors().getProjection().getSortedProjection(second), getMainFrame()); 
-                    //setComparationMode(true);
+                    
                     //needlemanWunsch.execute();
     }
     

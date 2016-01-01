@@ -58,7 +58,11 @@ public class DescriptorsDatasetFileChooser extends JDialog {
     private int paneNumber;
 
     public DescriptorsDatasetFileChooser(ImagePanel panel, int paneNumber) {
+        
+        
+        
         super(panel.getParentImageScrollPane().getParentMainFrame(), null, ModalityType.DOCUMENT_MODAL);
+        panel.getParentImageScrollPane().getParentMainFrame().setComparationMode(MainFrame.VisualisationType.NONE);
         this.panel = panel;
         this.paneNumber = paneNumber;
 

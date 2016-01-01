@@ -525,7 +525,6 @@ public abstract class LocalDescriptors {
         if (this.graphics == null) {
             this.graphics = graphics;
         }
-
         Iterator<ObjectFeature> iterator = visibleDescriptors.iterator();
         while (iterator.hasNext()) {
             draw(graphics, iterator.next());
@@ -539,77 +538,6 @@ public abstract class LocalDescriptors {
             
             //getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
         }
-        
-        
-        /*
-        
-        int longAx = ProjectionPointAx;
-        int longAy = ProjectionPointAy;
-        int longBx = ProjectionPointBx;
-        int longBy = ProjectionPointBy;
-        for(int i=0;i<3;i++){
-            longAx -= ProjectionPointBx - ProjectionPointAx;
-            longAy -= ProjectionPointBy - ProjectionPointAy;
-        }
-        for(int i=0;i<3;i++){
-            longBx += ProjectionPointBx - ProjectionPointAx;
-            longBy += ProjectionPointBy - ProjectionPointAy;
-        }
-        
-        */
-        //predlzenie 
-        //////////
-//        Projection projection = new Projection (ProjectionTo.X);
-       // Map<ObjectFeature, Float> visibleProjection = projection.getProjection(visibleDescriptors);
-        
-    
-        
-      /*  if(projection != null){
-            Map<ObjectFeature, Float> visibleProjection = new HashMap<ObjectFeature, Float>();
-           //Projection projection = new Projection (ProjectionTo.Y);
-           visibleProjection = projection.getProjection(visibleDescriptors);
-
-           ProjectionPanel bottomProjectionPanel = parentImagePanel.getParentImageScrollPane().getBottomProjectionPanel();
-           ProjectionPanel sideProjectionPanel = parentImagePanel.getParentImageScrollPane().getSideProjectionPanel();
-           
-           bottomProjectionPanel.setData(visibleProjection);
-                bottomProjectionPanel.repaint();
-                
-               sideProjectionPanel.setPosition("side");
-                sideProjectionPanel.setData(visibleProjection);
-                sideProjectionPanel.repaint();       
-        }
-       */ 
-       /*
-        Point2D left =  Projection.nearestPointOnLine2(longAx, longAy, longBx, longBy,
-                parentImagePanel.getParentImageScrollPane().getScrollPane().getHorizontalScrollBar().getValue(),
-                parentImagePanel.getParentImageScrollPane().getScrollPane().getVerticalScrollBar().getValue());
-
-        Point2D right =  Projection.nearestPointOnLine2(longAx, longAy, longBx, longBy,
-                parentImagePanel.getParentImageScrollPane().getScrollPane().getHorizontalScrollBar().getValue()+ parentImagePanel.getParentImageScrollPane().getScrollPane().getWidth(),
-                parentImagePanel.getParentImageScrollPane().getScrollPane().getVerticalScrollBar().getValue() + parentImagePanel.getParentImageScrollPane().getScrollPane().getHeight());
-        
-
-         graphics.setStroke(new BasicStroke(2));
-         graphics.setColor(Color.blue);
-            graphics.drawLine((int)longAx, (int)longAy, longBx, longBy);
-        
-        Iterator<ObjectFeature> iterator2 = visibleDescriptors.iterator();
-        while (iterator2.hasNext()) {
-            ObjectFeature asdsa = iterator2.next();
-
-            
-            float x = (float) Projection.nearestPointOnLine(left.getX(), left.getY(), right.getX(), right.getX(), 
-                    (float) Double.valueOf(getParentImagePanel().getImage().getWidth() * asdsa.getX()).intValue(),
-                    (float) Double.valueOf(getParentImagePanel().getImage().getHeight() * asdsa.getY()).intValue()
-            );
-
-            
-            visibleProjection.put(asdsa, x );
-             
-            
-        }
-       */
                 
  
         

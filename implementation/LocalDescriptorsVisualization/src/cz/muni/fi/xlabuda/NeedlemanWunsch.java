@@ -200,8 +200,11 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
         */       
         similarity = d[n][m];  
         
+        //mainFrame.setVisualisationType(MainFrame.VisualisationType.NEEDLEMANWUNSCH);
         
-        mainFrame.setComparationMode(true);
+        mainFrame.setComparationMode(MainFrame.VisualisationType.NEEDLEMANWUNSCH);
+        
+        
         mainFrame.getFirstScrollPane().getBottomProjectionPanel().setData(result1);
         mainFrame.getFirstScrollPane().getSideProjectionPanel().setData(result1);
         mainFrame.getSecondScrollPane().getBottomProjectionPanel().setData(result2);
@@ -230,7 +233,7 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
         mainFrame.getSecondScrollPane().getImagePanel().setLock(false);
 
         if(exitVisualization){
-            mainFrame.setComparationMode(false);
+            mainFrame.setComparationMode(MainFrame.VisualisationType.NONE);
         }
         
         mainFrame.HideVisualizationProgressBar();

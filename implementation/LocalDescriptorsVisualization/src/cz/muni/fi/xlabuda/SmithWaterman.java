@@ -234,7 +234,7 @@ public class SmithWaterman extends SwingWorker<Void, Void>{
         
         System.out.println("THREAD ONE");
         
-        mainFrame.setComparationMode(true);
+        mainFrame.setComparationMode(MainFrame.VisualisationType.SMITHWATERMAN);
         mainFrame.getFirstScrollPane().getBottomProjectionPanel().setData(result1);
         mainFrame.getFirstScrollPane().getSideProjectionPanel().setData(result1);
         mainFrame.getSecondScrollPane().getBottomProjectionPanel().setData(result2);
@@ -396,7 +396,7 @@ public class SmithWaterman extends SwingWorker<Void, Void>{
         
         System.out.println("THREAD ONE");
         
-        mainFrame.setComparationMode(true);
+        mainFrame.setComparationMode(MainFrame.VisualisationType.SMITHWATERMAN);
         mainFrame.getFirstScrollPane().getBottomProjectionPanel().setData(result1);
         mainFrame.getFirstScrollPane().getSideProjectionPanel().setData(result1);
         mainFrame.getSecondScrollPane().getBottomProjectionPanel().setData(result2);

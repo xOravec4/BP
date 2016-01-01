@@ -93,13 +93,13 @@ public class ImageFileChooser extends JDialog{
                     // Clear flag of loaded image
                     if (imagePanel.getImage() != null) {
                         if(imagePanel.getParentImageScrollPane().getParentMainFrame().getVisualizationType() != MainFrame.VisualisationType.NONE){
-                            imagePanel.getParentImageScrollPane().getParentMainFrame().setComparationMode(false);
+                            imagePanel.getParentImageScrollPane().getParentMainFrame().setComparationMode(MainFrame.VisualisationType.NONE);
                             imagePanel.getParentImageScrollPane().getParentMainFrame().resetProjectionsBoth();
                         }
                         ImageScrollPane scrollPane = (ImageScrollPane) 
                                 imagePanel.getParentImageScrollPane();
                         MainFrame mainFrame = scrollPane.getParentMainFrame();
-                        mainFrame.setComparationMode(false);
+                        mainFrame.setComparationMode(MainFrame.VisualisationType.NONE);
                         if (paneNumber == MainFrame.FIRST_IMAGE_PANEL) {
                             mainFrame.setFirstDescriptorsLoaded(false);
                         }
