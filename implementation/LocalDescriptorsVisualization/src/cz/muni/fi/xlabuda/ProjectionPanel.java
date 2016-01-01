@@ -65,12 +65,12 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
              public void mouseExited(MouseEvent e) {
                  if(dataList != null ){
                     getProjectionGlassPane().setHooveredComparisonDescriptor(null);
-                    System.out.println("Setting out dataList");
+                    //System.out.println("Setting out dataList");
                     return;
                 }
                 else if(dataMap != null ){
                     getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
-                    System.out.println("Setting out dataMap");
+                    //System.out.println("Setting out dataMap");
                     return;
                 }
              }
@@ -152,11 +152,20 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
               
         else if (dataList != null) {
             g.setColor(Color.RED);
+            ImageScrollPane otherISP = getParentImageScrollPane().getParentMainFrame().getOtherISP(getParentImageScrollPane());
             if (pos == Position.horizontal) {
                 float step = (float) this.getWidth() / (float) dataList.size();
+                /*
                 for (int i = 0; i < dataList.size(); i++) {
-                    if (dataList.get(i) != null) {
-                        ImageScrollPane otherISP = getParentImageScrollPane().getParentMainFrame().getOtherISP(getParentImageScrollPane());
+                    if (dataList.get(i) == null) {
+                        g.setColor(Color.black);
+                        g.fillRect((int) ((float) i * step), 1, pointSize, pointSize);
+                        g.setColor(Color.red);
+                    }  
+                } 
+                */
+                for (int i = 0; i < dataList.size(); i++) {
+                    if (dataList.get(i) != null) {  
                         if(otherISP.getBottomProjectionPanel().descriptorExistsAt(i)){
                             g.setColor(Color.green);
                         }
@@ -164,20 +173,25 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                             g.setColor(Color.red);
                         }
                         g.fillRect((int) ((float) i * step), 1, pointSize, pointSize);
-                        // System.out.println("Debug: "+ step +" "+ this.getWidth() +" "+ dataList.size());
-                    }else{
+                    }else{   
                         g.setColor(Color.black);
                         g.fillRect((int) ((float) i * step), 1, pointSize, pointSize);
                         g.setColor(Color.red);
-                    }
-                        
+                    }        
                 }
+
             } 
             else {
                 //System.out.println("im here");
                 float step = (float) this.getHeight() / (float) dataList.size();
                 for (int i = 0; i < dataList.size(); i++) {
                     if (dataList.get(i) != null) {
+                        if(otherISP.getBottomProjectionPanel().descriptorExistsAt(i)){
+                            g.setColor(Color.green);
+                        }
+                        else{
+                            g.setColor(Color.red);
+                        }
                         g.fillRect(1, (int) ((float) i * step), pointSize, pointSize);
                     }
                     else{
@@ -237,19 +251,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                 }
             }
             else if(dataList != null){
-                /*
-                int dataListSize = dataList.size();
-                float step = (float) this.getWidth() / (float) dataList.size();
-                for(int i=0; i< dataListSize;i++){
-                    float a =  ((float) i * step);
-                    if (  e.getX() >= a && e.getX() <= a + pointSize) {
-                      
-                      getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().set(dataList.get(i), a, i, getParentImageScrollPane().getImagePanel().getImage());
-                      return;
-                  }
-                }
-                */
+
                 int dataListSize = dataList.size();
                 float step = (float) this.getWidth() / (float) dataList.size();
                 for(int i=0; i< dataListSize;i++){
@@ -257,6 +259,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                     if (  e.getX() >= a && e.getX() <= a + pointSize) {
                       if(dataList.get(i) == null)
                           continue;
+                      System.out.println("SENDING AAAAAAAAAAAAA");
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
                       getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));
                       return;
@@ -265,6 +268,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                 for(int i=0; i< dataListSize;i++){
                     float a =  ((float) i * step);
                     if (  e.getX() >= a && e.getX() <= a + pointSize) {
+                        System.out.println("SENDING HEDA");
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
                       getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));
                       return;
@@ -280,8 +284,6 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                 float valuee = entry.getValue();
                 float value = this.getHeight() * valuee;
                 if(value > e.getY() - pointSize && value < e.getY()){
-                    //getProjectionGlassPane().setProjectionPanelPosition("top");
-                    //getProjectionGlassPane().setActivePanel(getParentImageScrollPane().getOrder());
                     getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
                     getProjectionGlassPane().setHooveredProjectionDescriptor(key, value);  
                     return;
@@ -290,6 +292,16 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
             if(dataList != null ){
                 int dataListSize = dataList.size();
                 float step = (float) this.getHeight() / (float) dataList.size();
+                for(int i=0; i< dataListSize;i++){
+                    float a =  ((float) i * step);
+                  if (  e.getY() >= a && e.getY() <= a + pointSize) {
+                      if(dataList.get(i) == null)
+                          continue;
+                      getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));                      
+                      return;
+                  }
+                }
                 for(int i=0; i< dataListSize;i++){
                     float a =  ((float) i * step);
                   if (  e.getY() >= a && e.getY() <= a + pointSize) {
@@ -306,12 +318,12 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
         
         if(dataList != null ){
             getProjectionGlassPane().setHooveredComparisonDescriptor(null);
-            System.out.println("Setting out dataList");
+            //System.out.println("Setting out dataList");
             return;
         }
         else if(dataMap != null ){
             getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
-            System.out.println("Setting out dataMap");
+            //System.out.println("Setting out dataMap");
             return;
         }
         

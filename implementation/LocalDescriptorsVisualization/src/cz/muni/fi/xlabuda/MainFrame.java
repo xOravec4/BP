@@ -233,6 +233,7 @@ public class MainFrame extends JFrame {
     private JButton NWSWMode1;
     private JButton NWSWMode2;
     private JButton NWSWMode3;
+    private JButton NWSWModeReload;
 
     private ImagePanel imagePanel;
     private ImageScrollPane imageScrollPane;
@@ -412,6 +413,7 @@ public class MainFrame extends JFrame {
         NWSWMode1 = new JButton();
         NWSWMode2 = new JButton();
         NWSWMode3 = new JButton();
+        NWSWModeReload = new JButton();
         
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -1096,6 +1098,21 @@ public class MainFrame extends JFrame {
                 Image.SCALE_SMOOTH);
         ImageIcon newNwswmode3Icon = new ImageIcon(nwswmode3Image);
         
+        url = getClass().getResource("icons/reload.png");
+        ImageIcon nwswmodeReloadIcon = new ImageIcon(url);
+        Image nwswmodeReloadImage = nwswmodeReloadIcon.getImage().getScaledInstance(ImageScrollPane.ICON_WIDTH,
+                ImageScrollPane.ICON_HEIGHT,
+                Image.SCALE_SMOOTH);
+        ImageIcon newNwswmodeReloadIcon = new ImageIcon(nwswmodeReloadImage);
+        
+        NWSWModeReload.setIcon(newNwswmodeReloadIcon);
+        NWSWModeReload.setToolTipText("Reload");
+        NWSWModeReload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                thisInstance.RefreshVisualization();
+            }
+        });
+        
         NWSWMode1.setIcon(newNwswmode1Icon);
         NWSWMode1.setToolTipText("1");
         NWSWMode1.addActionListener(new java.awt.event.ActionListener() {
@@ -1171,6 +1188,7 @@ public class MainFrame extends JFrame {
         
         comparativePanelNWSW.add(NWSWTotalDescriptorsSimiliraty);
         comparativePanelNWSW.add(hideGlasspaneButton);
+        comparativePanelNWSW.add(NWSWModeReload);
         comparativePanelNWSW.add(NWSWMode1);
         comparativePanelNWSW.add(NWSWMode2);
         comparativePanelNWSW.add(NWSWMode3);
@@ -1697,6 +1715,9 @@ public class MainFrame extends JFrame {
         else
             visualisationType = newType;
         
+        projectionFirstImage.setEnabled(!turnedOn);
+        projectionSecondImage.setEnabled(!turnedOn);
+        
 
         
         if(visualisationType == VisualisationType.NEEDLEMANWUNSCH ||
@@ -1994,6 +2015,10 @@ public class MainFrame extends JFrame {
         NWSWTotalDescriptorsSimiliraty.setText("Total similarity: " + Float.toString(a));
     }
     
+    public void SetNWSWCurrentSimilarity(ObjectFeature o1, ObjectFeature o2){
+        SetNWSWCurrentSimilarity(cost.getCost(o1, o2));
+    }
+    
     public void SetNWSWCurrentSimilarity(Float a){
         if(a != null)
             NWSWCurrentDescriptorSimiliraty.setText("Current two descriptors similarity: " +Float.toString(a));
@@ -2035,7 +2060,7 @@ public class MainFrame extends JFrame {
         return this;
     }
     
-    public void ShowVisualizationProgressBar(int max){
+    public synchronized void ShowVisualizationProgressBar(int max){
     
                 System.out.println("Creating 1");
  
@@ -2076,7 +2101,7 @@ public class MainFrame extends JFrame {
                 
     }
     
-    public void setDataToVisualizationProgressBar(int current){
+    public synchronized void setDataToVisualizationProgressBar(int current){
             
         //ComputeVisualizationProgressBar.setIndeterminate(false);
         ComputeVisualizationProgressBar.setValue(current);
@@ -2090,7 +2115,7 @@ public class MainFrame extends JFrame {
 
     }
     
-    public void HideVisualizationProgressBar(){
+    public synchronized void HideVisualizationProgressBar(){
         ComputeVisualizationDialog.setVisible(false);
         ComputeVisualizationDialog.dispose();
         ComputeVisualizationDialog = null;

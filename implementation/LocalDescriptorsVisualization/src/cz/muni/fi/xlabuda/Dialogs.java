@@ -436,6 +436,7 @@ public class Dialogs {
                 double minValue = ((Double) minimumSpinner.getValue()).doubleValue();
                 double maxValue = ((Double) maximumSpinner.getValue()).doubleValue();
                 if (minValue <= maxValue) {
+                    frame.resetProjectionsBoth();
                     frame.setVisualisationType(VisualisationType.BRUTEFORCE);
                     frame.setTresholdAndCreateGlasspane(minValue, maxValue, createGlasspane);
                     dialog.dispose();
@@ -499,6 +500,8 @@ public class Dialogs {
         final SpinnerModel matchMissmatchModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getMatchMismatch(), -50, 0, 0.1f);
         final SpinnerModel gapOpeningModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getGapOpening(), 0, 50, 0.1f);
         final SpinnerModel gapContinueModel = new SpinnerNumberModel(SequenceMatchingCost.SIFT_DEFAULT.getGapContinue(), 0, 50, 0.1f);
+        final SpinnerModel treshold1Model = new SpinnerNumberModel(120, 0, 1000, 10f);
+        final SpinnerModel treshold2Model = new SpinnerNumberModel(240, 0, 1000, 10f);
         
         final JSpinner matchExactSpinner = new JSpinner(matchExactModel);
         
@@ -506,6 +509,8 @@ public class Dialogs {
         final JSpinner matchMissmatchSpinner = new JSpinner(matchMissmatchModel);
         final JSpinner gapOpeningSpinner = new JSpinner(gapOpeningModel);
         final JSpinner gapContinueSpinner = new JSpinner(gapContinueModel);
+        final JSpinner treshold1Spinner = new JSpinner(treshold1Model);
+        final JSpinner treshold2Spinner = new JSpinner(treshold2Model);
         
 
         Dimension d = matchExactSpinner.getPreferredSize();  
@@ -528,11 +533,21 @@ public class Dialogs {
         d5.width = 50;  
         gapContinueSpinner.setPreferredSize(d);
         
+        Dimension d6 = treshold1Spinner.getPreferredSize();  
+        d6.width = 50;  
+        treshold1Spinner.setPreferredSize(d);
+        
+        Dimension d7 = treshold2Spinner.getPreferredSize();  
+        d7.width = 50;  
+        treshold2Spinner.setPreferredSize(d);
+        
         JLabel matchExact = new JLabel("matchExact");
         JLabel matchApproximate = new JLabel("matchApproximate");
         JLabel matchMissmatch = new JLabel("matchMissmatch");
         JLabel gapOpening = new JLabel("gapOpening");
         JLabel gapContinue = new JLabel("gapContinue");
+        JLabel treshold1 = new JLabel("treshold1");
+        JLabel treshold2 = new JLabel("treshold2");
         
         spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.PAGE_AXIS));
         
@@ -563,6 +578,16 @@ public class Dialogs {
             spinnerPanel.add(row5);
         }
         
+        final JPanel row6 = new JPanel();
+        row6.add(treshold1);
+        row6.add(treshold1Spinner);
+        spinnerPanel.add(row6);
+        
+        final JPanel row7 = new JPanel();
+        row7.add(treshold2);
+        row7.add(treshold2Spinner);
+        spinnerPanel.add(row7);
+        
         JButton approveButton = new JButton();
         approveButton.setText(localLanguage.getString("button"));
 
@@ -576,15 +601,13 @@ public class Dialogs {
         approveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
+                if(((Double) treshold1Spinner.getValue()).floatValue() > ((Double) treshold2Spinner.getValue()).floatValue()){
+                    JOptionPane.showMessageDialog(null, "cant be ", "InfoBox: ", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                
 
                 frame.setProjectionGlassPane();
-                
-                /*
-                if(type ==VisualisationType.NEEDLEMANWUNSCH)
-                     frame.setVisualisationType(VisualisationType.NEEDLEMANWUNSCH);
-                else if(type ==VisualisationType.SMITHWATERMAN)
-                    frame.setVisualisationType(VisualisationType.SMITHWATERMAN);
-                        */
                 
                 frame.getFirstScrollPane().getImagePanel().setXPanelShift(0);
                 frame.getSecondScrollPane().getImagePanel().setXPanelShift(0);
@@ -605,8 +628,8 @@ public class Dialogs {
                         ((Double) matchExactSpinner.getValue()).floatValue() , 
                         ((Double) matchApproximateSpinner.getValue()).floatValue() , 
                         ((Double) matchMissmatchSpinner.getValue()).floatValue(), 
-                        120.0f, 
-                        240.0f);
+                        ((Double) treshold1Spinner.getValue()).floatValue(), 
+                        ((Double) treshold2Spinner.getValue()).floatValue());
                 
                 frame.setSequenceMatchingScoring(cost);
                 
