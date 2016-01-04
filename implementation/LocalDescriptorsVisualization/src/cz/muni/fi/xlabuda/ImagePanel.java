@@ -257,8 +257,6 @@ public final class ImagePanel extends JPanel {
                     int y = Double.valueOf(zoomedClickedPoint.getY() / zoomScale).intValue();
 
                         gp.highlightNearestDescriptor(new Point(x, y), getParentImageScrollPane(), 12);
-
-                    System.out.println("GP CLICKED" + x + " " + y);
                     return;
                 }
                 
@@ -278,7 +276,6 @@ public final class ImagePanel extends JPanel {
                         int x = Double.valueOf(zoomedClickedPoint.getX() / zoomScale).intValue();
                         int y = Double.valueOf(zoomedClickedPoint.getY() / zoomScale).intValue();
                         if(descriptors.hideNearestDescriptors(new Point(x,y))){
-                          System.out.println("P B");
                             recalculateProjectionVisualization();   
                         }
                        
@@ -299,8 +296,6 @@ public final class ImagePanel extends JPanel {
                 
                 if(firstProjectionPoint != null ){
 
-                    System.err.println(firstProjectionPoint.getX() *zoomScale + " " + firstProjectionPoint.getY() *zoomScale+ " vs " + e.getX() + " " + e.getY());
-                    //int distance = (int)Math.sqrt((mouseX-firstProjectionPoint.getX())*(mouseX-firstProjectionPoint.getX())+(mouseY-firstProjectionPoint.getY())*(mouseY-firstProjectionPoint.getY()));
                     int distance = (int)Math.sqrt((e.getX()-firstProjectionPoint.getX()*zoomScale)*(e.getX()-firstProjectionPoint.getX()*zoomScale)+(e.getY()-firstProjectionPoint.getY()*zoomScale)*(e.getY()-firstProjectionPoint.getY()*zoomScale));
                     if(distance < 14 * zoomScale){
                         projectionPointMoving = ProjectionPointMoving.FIRST;
@@ -327,8 +322,6 @@ public final class ImagePanel extends JPanel {
                     } else {
                         getParentImageScrollPane().getParentMainFrame().repaintAll();
                     }
-                    //System.out.println("P PF");
-                    //recalculateProjectionVisualization();
                 }
 
                 // Start move image in panel
@@ -347,7 +340,6 @@ public final class ImagePanel extends JPanel {
                 if(projectionPointMoving == ProjectionPointMoving.FIRST ||
                        projectionPointMoving == ProjectionPointMoving.SECOND ){
                      recalculateProjectionVisualization();
-                     System.out.println("P LDd");
                             
                             
                 }
@@ -355,7 +347,6 @@ public final class ImagePanel extends JPanel {
                  
                 
                 if(e.getButton() == MouseEvent.BUTTON2 && !gettingRectangle){
-                    System.out.println("CLICLED ASRGASD"); 
                     recalculateProjectionVisualization();
                 }
                 
@@ -372,7 +363,6 @@ public final class ImagePanel extends JPanel {
                                     rectangleStartPoint.getY()).intValue()));
                             
                             recalculateProjectionVisualization();
-                            System.out.println("P LD");
                     } else {
                         rectangleStartPoint = null;
                         rectangleEndPoint = null;
@@ -600,7 +590,6 @@ public final class ImagePanel extends JPanel {
     
     @Override
     public void paintComponent(Graphics graphics) {
-       // System.out.println("paint");
         super.paintComponent(graphics);
         Graphics2D graphics2D = (Graphics2D) graphics;
         
@@ -635,7 +624,12 @@ public final class ImagePanel extends JPanel {
         Color projColor = Color.CYAN;
         if(firstProjectionPoint != null && secondProjectionPoint != null){
             int r = 20;
-            projColor = ((ProjectionGlassPane)frame.getGlassPane()).getHooverColor();
+            try{
+                projColor = ((ProjectionGlassPane)frame.getGlassPane()).getHooverColor();
+            }
+            catch(Exception ex){
+                projColor = Color.RED;
+            }
             graphics2D.setColor(projColor);
             graphics2D.setStroke(new BasicStroke(4));
             graphics2D.drawLine((int)firstProjectionPoint.getX(), (int)firstProjectionPoint.getY(),
@@ -709,12 +703,10 @@ public final class ImagePanel extends JPanel {
         Rectangle a = getViewportRange(getParentImageScrollPane());
        
         if(a.getY() + a.getHeight() < height){
-            System.out.println(a);
             firstProjectionPoint = new Point2D.Double(firstProjectionPoint.getX(), a.getY() + (a.getHeight()/2));
             secondProjectionPoint = new Point2D.Double((secondProjectionPoint.getX()), a.getY() + (a.getHeight()/2));
         }
         if(a.getX() + a.getWidth() < width){
-            System.out.println(a);
             firstProjectionPoint = new Point2D.Double(a.getX() + (a.getWidth()/3 ), firstProjectionPoint.getY());
             secondProjectionPoint = new Point2D.Double(a.getX() + ((a.getWidth()/3) *2), secondProjectionPoint.getY());
         }

@@ -162,6 +162,7 @@ public abstract class LocalDescriptors {
      * @param descriptors descriptors in the set
      */
     public final void setDescriptors(ObjectFeatureSet descriptors) {
+        cancelProjection();
         this.descriptors = descriptors;
         boolean absoluteLocation = false;
 
@@ -855,10 +856,6 @@ public abstract class LocalDescriptors {
      */
     public abstract String getDescriptorsDescription();
     
-    public void setProjectionPanel(ProjectionPanel panel)
-    {
-        
-    }
     
     public void setProjectionPointA(int x, int y){
        ProjectionPointAx = x;
@@ -868,24 +865,20 @@ public abstract class LocalDescriptors {
     public void setProjectionPointB(int x, int y){
        ProjectionPointBx = x;
        ProjectionPointBy = y;
-       System.out.println("BBBBBBBBBBBBBBBBB");
     }
     
-    public void setProjection(ProjectionTo projectionTo){
-        System.out.println("Setting projection");
+    public void setProjection(ProjectionTo projectionTo){        
         projection = new Projection(projectionTo);
         recalculateProjection();
     }
     
     public void setProjection(Projection projection){
-        System.out.println("Setting projection");
         this.projection = projection;
         recalculateProjection();
     }
     
     public void setProjection(ProjectionTo projectionTo, Point2D a, Point2D b){
-        System.out.println("Setting projection");
-        projection = new Projection(projectionTo, a, b);
+        projection = new Projection(projectionTo, a, b, getParentImagePanel().getImage().getWidth(), getParentImagePanel().getImage().getHeight());
         recalculateProjection();
     }
     
@@ -895,8 +888,6 @@ public abstract class LocalDescriptors {
         Map <ObjectFeature, Float> proj = null;
         if(projection.getProjectionType() == ProjectionTo.CUSTOM){
             proj = projection.getProjection(visibleDescriptors,
-                        getParentImagePanel().getImage().getWidth(),
-                        getParentImagePanel().getImage().getHeight(),
                         getParentImagePanel().getFirstProjectionPoint(),
                         getParentImagePanel().getSecondProjectionPoint()
                         );
@@ -907,23 +898,21 @@ public abstract class LocalDescriptors {
         
         ProjectionPanel bottomProjectionPanel = parentImagePanel.getParentImageScrollPane().getBottomProjectionPanel();
         ProjectionPanel sideProjectionPanel = parentImagePanel.getParentImageScrollPane().getSideProjectionPanel();
-        bottomProjectionPanel.setData(proj);
-        sideProjectionPanel.setData(proj);
+        bottomProjectionPanel.setProjectionDescriptors(proj);
+        sideProjectionPanel.setProjectionDescriptors(proj);
         bottomProjectionPanel.repaint();
         sideProjectionPanel.repaint();
         
     }
-    //checkOnlyProjection
+
     public void recalculateVisualization(){
         
         if(projection == null)
             return; 
         
-        System.out.println("Recalculatin projection");
         recalculateProjection();
         
         if(visualizationMode){
-            System.out.println("Recalculatin visualization");
             getParentImagePanel().getParentImageScrollPane().getParentMainFrame().RefreshVisualization();
             return;
         }       
@@ -931,8 +920,9 @@ public abstract class LocalDescriptors {
     }
     
     public void cancelProjection(){
-        System.out.println("Setting sett to null");
         projection = null;
+        getParentImagePanel().getParentImageScrollPane().getParentMainFrame().resetProjectionSelectionMenu(getParentImagePanel().getParentImageScrollPane());
+        getParentImagePanel().HideCustomProjectionPoints();
     }
     
     public ProjectionTo getProjectionType(){

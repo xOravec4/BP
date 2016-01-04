@@ -10,11 +10,13 @@ import static messif.objects.impl.ObjectFeatureSetNeedlemanWunsch.max3;
 import messif.objects.util.SequenceMatchingCost;
 
 /**
+ * Counts alignment of two sequences and results are set to ProjectionPanels and can be obtained again by get methods.
  *
- * @author Tomas
+ * @author Tomas Oravec
+ * @version 1.0
  */
+
 public class NeedlemanWunsch extends SwingWorker<Void, Void>{
-    
     
     private List<ObjectFeature> result1 = new ArrayList<ObjectFeature>();
     private List<ObjectFeature> result2 = new ArrayList<ObjectFeature>();
@@ -25,7 +27,6 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
     List <ObjectFeature> list2 = null;
     MainFrame mainFrame = null;
     private boolean exitVisualization = false;
-
     
      NeedlemanWunsch(List <ObjectFeature> list1,  List <ObjectFeature> list2, MainFrame mainFrame) {
          this(SequenceMatchingCost.SIFT_DEFAULT, list1, list2, mainFrame);
@@ -191,24 +192,15 @@ public class NeedlemanWunsch extends SwingWorker<Void, Void>{
         
         Collections.reverse(result1);
         Collections.reverse(result2);
-
-        /*
-        System.out.println("First Input size: " + list1.size());
-        System.out.println("Second input size: " + list2.size());
-        System.out.println("First result size " + result1.size());
-        System.out.println("Second result size: " + result2.size());
-        */       
+     
         similarity = d[n][m];  
-        
-        //mainFrame.setVisualisationType(MainFrame.VisualisationType.NEEDLEMANWUNSCH);
-        
+           
         mainFrame.setComparationMode(MainFrame.VisualisationType.NEEDLEMANWUNSCH);
         
-        
-        mainFrame.getFirstScrollPane().getBottomProjectionPanel().setData(result1);
-        mainFrame.getFirstScrollPane().getSideProjectionPanel().setData(result1);
-        mainFrame.getSecondScrollPane().getBottomProjectionPanel().setData(result2);
-        mainFrame.getSecondScrollPane().getSideProjectionPanel().setData(result2);
+        mainFrame.getFirstScrollPane().getBottomProjectionPanel().setComparisonDescriptors(result1);
+        mainFrame.getFirstScrollPane().getSideProjectionPanel().setComparisonDescriptors(result1);
+        mainFrame.getSecondScrollPane().getBottomProjectionPanel().setComparisonDescriptors(result2);
+        mainFrame.getSecondScrollPane().getSideProjectionPanel().setComparisonDescriptors(result2);
         mainFrame.getFirstScrollPane().getBottomProjectionPanel().repaint();
         mainFrame.getFirstScrollPane().getSideProjectionPanel().repaint();
         mainFrame.getSecondScrollPane().getBottomProjectionPanel().repaint();

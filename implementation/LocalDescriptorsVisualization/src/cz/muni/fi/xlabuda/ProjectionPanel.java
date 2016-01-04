@@ -19,36 +19,25 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Panel for visualizations of projections and results of sequence matching algorithms.
  *
- * @author Tomas
+ * @author Tomas Oravec
+ * @version 1.0
  */
 public class ProjectionPanel extends JPanel implements MouseMotionListener{
     
-        /** Image size - width & height in pixels */
-    private int width;
-    private int height;
-    private int xPanelShift = 0;
-    private int yPanelShift = 0;
-    private double zoomScale = 1;
     
-    private int imageHorizontalScrollValue = 0;
-    private int imageVerticalScrollValue = 0;
-    private float zoom = 1;
-    
-    private String position = "bot";
     private enum Position {horizontal, verical};
     private Position pos;
     private int pointSize = 5;
     
     
-    Map<ObjectFeature, Float> dataMap = new HashMap<ObjectFeature, Float>();
-    List<ObjectFeature> dataList = new ArrayList<ObjectFeature>();
+    Map<ObjectFeature, Float> projectionDescriptors = new HashMap<ObjectFeature, Float>();
+    List<ObjectFeature> comparisonDescriptors = new ArrayList<ObjectFeature>();
     
     public ProjectionPanel()
     {   
-        
-        //this.setBackground(Color.white);
-        //this.setBorder(BorderFactory.createEmptyBorder(0,10,10,10));
+
         addMouseMotionListener(this);
         
         addMouseListener(new MouseListener() {
@@ -63,14 +52,12 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
              public void mouseEntered(MouseEvent e) {}
              
              public void mouseExited(MouseEvent e) {
-                 if(dataList != null ){
+                 if(comparisonDescriptors != null ){
                     getProjectionGlassPane().setHooveredComparisonDescriptor(null);
-                    //System.out.println("Setting out dataList");
                     return;
                 }
-                else if(dataMap != null ){
+                else if(projectionDescriptors != null ){
                     getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
-                    //System.out.println("Setting out dataMap");
                     return;
                 }
              }
@@ -86,37 +73,19 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
     
     
     
-    public void setData(Map<ObjectFeature, Float> dataMap)
+    public void setProjectionDescriptors(Map<ObjectFeature, Float> dataMap)
     {
-        this.dataMap = new HashMap(dataMap);
-        this.dataList = null;
+        this.projectionDescriptors = new HashMap(dataMap);
+        this.comparisonDescriptors = null;
     }
     
-    public void setData(List<ObjectFeature> dataList)
+    public void setComparisonDescriptors(List<ObjectFeature> dataList)
     {
-        this.dataList = new ArrayList(dataList);
-        this.dataMap = null;
+        this.comparisonDescriptors = new ArrayList(dataList);
+        this.projectionDescriptors = null;
     }
     
-    public void setXPanelShift(int shift) throws IOException{
-        xPanelShift = shift;
-        throw new IOException();
-        /**/
-    }
-    public void setYPanelShift(int shift)  {
-        yPanelShift = shift;
-        /**/
-    }
-    
-    public void zoomIN()
-    {
-        //zoomScale *= 1.2;
-    
-    }
-    
-    public void setPosition(String pos){
-        position = pos;
-    }
+
     
     private void checkPosition(){
         if(this.getWidth() > this.getHeight())
@@ -125,24 +94,26 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
             pos = Position.verical;
     }
     
+    
+    //paints projections points or results of sequence mathing algorithms, depending on what is set.
     @Override
     public void paintComponent(Graphics g) {
         checkPosition();
          super.paintComponent(g);
          
-        if (dataMap != null) {
+        if (projectionDescriptors != null) {
 
             g.setColor(Color.RED);
 
             if (pos == Position.horizontal) {
-                for (Map.Entry<ObjectFeature, Float> entry : dataMap.entrySet()) {
+                for (Map.Entry<ObjectFeature, Float> entry : projectionDescriptors.entrySet()) {
                     ObjectFeature key = entry.getKey();
                     float value = entry.getValue();
                     g.fillOval((int) (this.getWidth() * value), 1, pointSize, pointSize);
                 }
             } 
             else {
-                for (Map.Entry<ObjectFeature, Float> entry : dataMap.entrySet()) {
+                for (Map.Entry<ObjectFeature, Float> entry : projectionDescriptors.entrySet()) {
                     ObjectFeature key = entry.getKey();
                     float value = entry.getValue();
                     g.fillRect(1, (int) (this.getHeight() * value), pointSize, pointSize);
@@ -150,22 +121,13 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
             }
         }
               
-        else if (dataList != null) {
+        else if (comparisonDescriptors != null) {
             g.setColor(Color.RED);
             ImageScrollPane otherISP = getParentImageScrollPane().getParentMainFrame().getOtherISP(getParentImageScrollPane());
             if (pos == Position.horizontal) {
-                float step = (float) this.getWidth() / (float) dataList.size();
-                /*
-                for (int i = 0; i < dataList.size(); i++) {
-                    if (dataList.get(i) == null) {
-                        g.setColor(Color.black);
-                        g.fillRect((int) ((float) i * step), 1, pointSize, pointSize);
-                        g.setColor(Color.red);
-                    }  
-                } 
-                */
-                for (int i = 0; i < dataList.size(); i++) {
-                    if (dataList.get(i) != null) {  
+                float step = (float) this.getWidth() / (float) comparisonDescriptors.size();
+                for (int i = 0; i < comparisonDescriptors.size(); i++) {
+                    if (comparisonDescriptors.get(i) != null) {  
                         if(otherISP.getBottomProjectionPanel().descriptorExistsAt(i)){
                             g.setColor(Color.green);
                         }
@@ -182,10 +144,9 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
 
             } 
             else {
-                //System.out.println("im here");
-                float step = (float) this.getHeight() / (float) dataList.size();
-                for (int i = 0; i < dataList.size(); i++) {
-                    if (dataList.get(i) != null) {
+                float step = (float) this.getHeight() / (float) comparisonDescriptors.size();
+                for (int i = 0; i < comparisonDescriptors.size(); i++) {
+                    if (comparisonDescriptors.get(i) != null) {
                         if(otherISP.getBottomProjectionPanel().descriptorExistsAt(i)){
                             g.setColor(Color.green);
                         }
@@ -208,14 +169,6 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
 
     
     public ImageScrollPane getParentImageScrollPane() {
-       /* if(position == "bot"){
-        ImageScrollPane pane = (ImageScrollPane) getParent().getParent();
-        return pane;
-        }
-        else{
-          ImageScrollPane pane = (ImageScrollPane) getParent();  
-          return pane;
-        }*/
         ImageScrollPane pane = (ImageScrollPane) getParent();  
           return pane;
     }
@@ -231,15 +184,15 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        System.out.println("Mouse dragged (" + e.getX() + ',' + e.getY() + ')');
     }
 
+    //finds hoovered descriptor and sends it to projectionGlassPane
     @Override
     public void mouseMoved(MouseEvent e) {
         
-        if(pos == Position.horizontal){  //bottom panel
-            if (dataMap != null) {
-                for (Map.Entry<ObjectFeature, Float> entry : dataMap.entrySet()) {
+        if(pos == Position.horizontal){  
+            if (projectionDescriptors != null) {
+                for (Map.Entry<ObjectFeature, Float> entry : projectionDescriptors.entrySet()) {
                     ObjectFeature key = entry.getKey();
                     float valuee = entry.getValue();
                     float value = this.getWidth() * valuee;
@@ -250,27 +203,25 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                     }
                 }
             }
-            else if(dataList != null){
+            else if(comparisonDescriptors != null){
 
-                int dataListSize = dataList.size();
-                float step = (float) this.getWidth() / (float) dataList.size();
+                int dataListSize = comparisonDescriptors.size();
+                float step = (float) this.getWidth() / (float) comparisonDescriptors.size();
                 for(int i=0; i< dataListSize;i++){
                     float a =  ((float) i * step);
                     if (  e.getX() >= a && e.getX() <= a + pointSize) {
-                      if(dataList.get(i) == null)
+                      if(comparisonDescriptors.get(i) == null)
                           continue;
-                      System.out.println("SENDING AAAAAAAAAAAAA");
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(comparisonDescriptors.get(i));
                       return;
                   }
                 }
                 for(int i=0; i< dataListSize;i++){
                     float a =  ((float) i * step);
                     if (  e.getX() >= a && e.getX() <= a + pointSize) {
-                        System.out.println("SENDING HEDA");
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(comparisonDescriptors.get(i));
                       return;
                   }
                 }
@@ -278,8 +229,8 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
         }
         
         else{
-            if(dataMap != null)
-            for (Map.Entry<ObjectFeature, Float> entry : dataMap.entrySet()) {
+            if(projectionDescriptors != null)
+            for (Map.Entry<ObjectFeature, Float> entry : projectionDescriptors.entrySet()) {
                 ObjectFeature key = entry.getKey();
                 float valuee = entry.getValue();
                 float value = this.getHeight() * valuee;
@@ -289,16 +240,16 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                     return;
                 }
             }
-            if(dataList != null ){
-                int dataListSize = dataList.size();
-                float step = (float) this.getHeight() / (float) dataList.size();
+            if(comparisonDescriptors != null ){
+                int dataListSize = comparisonDescriptors.size();
+                float step = (float) this.getHeight() / (float) comparisonDescriptors.size();
                 for(int i=0; i< dataListSize;i++){
                     float a =  ((float) i * step);
                   if (  e.getY() >= a && e.getY() <= a + pointSize) {
-                      if(dataList.get(i) == null)
+                      if(comparisonDescriptors.get(i) == null)
                           continue;
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));                      
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(comparisonDescriptors.get(i));                      
                       return;
                   }
                 }
@@ -307,7 +258,7 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
                   if (  e.getY() >= a && e.getY() <= a + pointSize) {
                       
                       getProjectionGlassPane().setActivePanel(this.getParentImageScrollPane());
-                      getProjectionGlassPane().setHooveredComparisonDescriptor(dataList.get(i));                      
+                      getProjectionGlassPane().setHooveredComparisonDescriptor(comparisonDescriptors.get(i));                      
                       return;
                   }
                 }
@@ -316,83 +267,80 @@ public class ProjectionPanel extends JPanel implements MouseMotionListener{
             
         }
         
-        if(dataList != null ){
+        if(comparisonDescriptors != null ){
             getProjectionGlassPane().setHooveredComparisonDescriptor(null);
-            //System.out.println("Setting out dataList");
             return;
         }
-        else if(dataMap != null ){
+        else if(projectionDescriptors != null ){
             getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
-            //System.out.println("Setting out dataMap");
             return;
         }
         
         getProjectionGlassPane().setHooveredProjectionDescriptor(null,0);
-        System.out.println("Setting out dataMap");
         
         
       
 
     }
     
-    public ObjectFeature getDescriptorAt(int i){
-        if(dataList == null)
+    public ObjectFeature getComparisonDescriptorAt(int i){
+        if(comparisonDescriptors == null)
             return null;
-        if(dataList.size()-1 <i && i >0)
+        if(comparisonDescriptors.size()-1 <i && i >0)
             return null;
-        return dataList.get(i);
+        return comparisonDescriptors.get(i);
     }
     
-    public int getDescriptorValueAt(int i){
+    private int getComparisonDescriptorValueAt(int i){
         if(pos == Position.horizontal){
-            float step = (float) this.getWidth() / (float) dataList.size();
+            float step = (float) this.getWidth() / (float) comparisonDescriptors.size();
             return (int)((float) i * step);
         }
         else{
-           float step = (float) this.getHeight() / (float) dataList.size();
+           float step = (float) this.getHeight() / (float) comparisonDescriptors.size();
            return (int)((float) i * step); 
         }
     }
     
-    public int getDescriptorValueAt(ObjectFeature o){
-        int index = dataList.indexOf(o);
+    public int getComparisonDescriptorValueAt(ObjectFeature o){
+        int index = comparisonDescriptors.indexOf(o);
         if(index != -1){
-            return getDescriptorValueAt(index);
+            return getComparisonDescriptorValueAt(index);
         }
         return 0;
     }
     
-    public int getDescriptorIndex(ObjectFeature o){
-        if(dataList == null)
+    public int getComparisonDescriptorIndex(ObjectFeature o){
+        if(comparisonDescriptors == null)
             return -1;
         
-        return dataList.indexOf(o);
+        return comparisonDescriptors.indexOf(o);
     }
     
     public void clear(){
-        dataList = null;
-        dataMap = null;
+        comparisonDescriptors = null;
+        projectionDescriptors = null;
         revalidate();
         repaint();
     }
     
     public boolean descriptorExistsAt(int i){
-        if(dataList == null)
+        if(comparisonDescriptors == null)
             return false;
         
-        if(dataList.size() < i)
+        if(comparisonDescriptors.size() < i)
             return false;
         
-        if(dataList.get(i) == null)
+        if(comparisonDescriptors.get(i) == null)
             return false;
         
         return true;
                 
     }
     
-    public List<ObjectFeature> getDataList(){
-        if(dataList != null)
-            return new ArrayList<ObjectFeature>(dataList);
+    public List<ObjectFeature> getComparisonDescriptors(){
+        if(comparisonDescriptors != null)
+            return new ArrayList<ObjectFeature>(comparisonDescriptors);
         else
             return null;
     }

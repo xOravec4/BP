@@ -8,23 +8,39 @@ import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.HashMap;
 
-
+/**
+ * Class responsible for projections of sets of descriptors to axis x/y or line.
+ *
+ * @author Tomas Oravec
+ * @version 1.0
+ */
 public class Projection {
 
     private ProjectionTo projectionTo;
     private Point2D custonProjectionFirstPoint;
     private Point2D custonProjectionSecondPoint;
+    private int imageWidth; 
+    private int imageHeigt;
+            
 
+    /**
+     * Constructor used for setting projection to X or Y, not custom!
+     */
     public Projection(ProjectionTo projectionTo) {
         this.projectionTo = projectionTo;
         custonProjectionFirstPoint = null;
         custonProjectionSecondPoint = null;
     }
 
-    public Projection(ProjectionTo projectionTo, Point2D custonProjectionFirstPoint, Point2D custonProjectionSecondPoint) {
+    /**
+     * Constructor used for setting projection to custom line, given by two points in image.
+     */
+    public Projection(ProjectionTo projectionTo, Point2D custonProjectionFirstPoint, Point2D custonProjectionSecondPoint, int imageWidth, int imageHeigt) {
         this.projectionTo = ProjectionTo.CUSTOM;
         this.custonProjectionFirstPoint = custonProjectionFirstPoint;
         this.custonProjectionSecondPoint = custonProjectionSecondPoint;
+        this.imageHeigt = imageHeigt;
+        this.imageWidth = imageWidth;
     }
 
     public void setProjectionPoints(Point2D custonProjectionFirstPoint, Point2D custonProjectionSecondPoint) {
@@ -32,6 +48,9 @@ public class Projection {
         this.custonProjectionSecondPoint = custonProjectionSecondPoint;
     }
 
+    /**
+     * Returns X and Y projections.
+     */
     public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList) {
         Map<ObjectFeature, Float> result = new HashMap<ObjectFeature, Float>();
 
@@ -51,18 +70,25 @@ public class Projection {
 
         }
     }
-
-    public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList, int imageWidth, int imageHeigt, Point2D A, Point2D B) {
-
-        Map<ObjectFeature, Float> result = new HashMap<ObjectFeature, Float>();
+    
+    /**
+     * Returns custom projections given by two points in image.
+     */
+    public Map<ObjectFeature, Float> getProjection(Set<ObjectFeature> objFeatureList, Point2D A, Point2D B) {
         custonProjectionFirstPoint = A;
         custonProjectionSecondPoint = B;
+        return getCustomProjection(objFeatureList);
+    }
+
+    private Map<ObjectFeature, Float> getCustomProjection(Set<ObjectFeature> objFeatureList) {
+
+        Map<ObjectFeature, Float> result = new HashMap<ObjectFeature, Float>();
         switch (projectionTo) {
             case CUSTOM:
                 for (ObjectFeature objectFeature : objFeatureList) {
-                    if (inRange(A.getX(), A.getY(), B.getX(), B.getY(), objectFeature.getX() * imageWidth, objectFeature.getY() * imageHeigt)) {
-                        result.put(objectFeature, projectPointToLine(A.getX(), A.getY(),
-                                B.getX(), B.getY(),
+                    if (canProject(custonProjectionFirstPoint.getX(), custonProjectionFirstPoint.getY(), custonProjectionSecondPoint.getX(), custonProjectionSecondPoint.getY(), objectFeature.getX() * imageWidth, objectFeature.getY() * imageHeigt)) {
+                        result.put(objectFeature, projectPointToLine(custonProjectionFirstPoint.getX(), custonProjectionFirstPoint.getY(),
+                                custonProjectionSecondPoint.getX(), custonProjectionSecondPoint.getY(),
                                 objectFeature.getX() * imageWidth, objectFeature.getY() * imageHeigt));
                     }
                 }
@@ -72,10 +98,18 @@ public class Projection {
                 return null;
         }
     }
-
+    
+    
+    /**
+     * Returns sorted projection.
+     */
     public List<ObjectFeature> getSortedProjection(Set<ObjectFeature> objFeatureList) {
-
-        Map<ObjectFeature, Float> result = getProjection(objFeatureList);
+        
+        Map<ObjectFeature, Float> result = null;
+        if(projectionTo == ProjectionTo.CUSTOM)
+            result = getCustomProjection(objFeatureList);
+        else
+            result = getProjection(objFeatureList);
 
         List<ObjectFeature> keys = new ArrayList<ObjectFeature>();
         List<Float> values = new ArrayList<Float>();
@@ -92,7 +126,9 @@ public class Projection {
                 if (Math.abs(entry.getValue() - values.get(i)) < 0.00000001) {
 
                     if (Math.abs((entry.getKey().getOrientation() - keys.get(i).getOrientation())) < 0.00001) {
-
+                            keys.add(i, entry.getKey());
+                            values.add(i, entry.getValue());
+                            break;
                     } else {
 
                         if (entry.getKey().getOrientation() < keys.get(i).getOrientation()) {
@@ -127,7 +163,7 @@ public class Projection {
 
     }
 
-    public static float projectPointToLine(double ax, double ay, double bx, double by, double px, double py) {
+    private static float projectPointToLine(double ax, double ay, double bx, double by, double px, double py) {
 
         Point2D dest = new Point2D.Double();
 
@@ -162,7 +198,10 @@ public class Projection {
         return custonProjectionSecondPoint;
     }
 
-    public static boolean inRange(double start_x, double start_y, double end_x, double end_y,
+    /**
+    * Checks, if third point can project to the line defined by first and second points.
+    */
+    private static boolean canProject(double start_x, double start_y, double end_x, double end_y,
             double point_x, double point_y) {
         double dx = end_x - start_x;
         double dy = end_y - start_y;

@@ -200,7 +200,6 @@ public class ImageScrollPane extends JPanel {
         toggleProjectionButton.setFocusPainted(false);
         toggleProjectionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-               System.out.println("toggleProjectionButton");
                ToggleProjectionPanels();
             }
         });

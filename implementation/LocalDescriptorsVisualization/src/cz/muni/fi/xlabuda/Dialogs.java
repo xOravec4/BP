@@ -153,6 +153,7 @@ public class Dialogs {
                     frame, localLanguage.getString("cchd_title"),
                     glasspane.getLinesColor());
             if (newColor != null) {
+                frame.setDefaultLinesColor(newColor);
                 glasspane.setLinesColor(newColor);
             }
         
@@ -485,7 +486,9 @@ public class Dialogs {
 
      
      
-     
+    /**
+     * Sets values for needlemanwunsch and smithwaterman algorithms.
+     */ 
     public static void SequenceMatchingAlgorithmScrogingDialog(final MainFrame frame, final VisualisationType type) {
         if(type == VisualisationType.BRUTEFORCE)
             return;
@@ -541,13 +544,13 @@ public class Dialogs {
         d7.width = 50;  
         treshold2Spinner.setPreferredSize(d);
         
-        JLabel matchExact = new JLabel("matchExact");
-        JLabel matchApproximate = new JLabel("matchApproximate");
-        JLabel matchMissmatch = new JLabel("matchMissmatch");
-        JLabel gapOpening = new JLabel("gapOpening");
-        JLabel gapContinue = new JLabel("gapContinue");
-        JLabel treshold1 = new JLabel("treshold1");
-        JLabel treshold2 = new JLabel("treshold2");
+        JLabel matchExact = new JLabel(localLanguage.getString("matchE"));
+        JLabel matchApproximate = new JLabel(localLanguage.getString("matchA"));
+        JLabel matchMissmatch = new JLabel(localLanguage.getString("matchM"));
+        JLabel gapOpening = new JLabel(localLanguage.getString("gapO"));
+        JLabel gapContinue = new JLabel(localLanguage.getString("gapC"));
+        JLabel treshold1 = new JLabel(localLanguage.getString("tresholdE"));
+        JLabel treshold2 = new JLabel(localLanguage.getString("tresholdA"));
         
         spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.PAGE_AXIS));
         
@@ -595,16 +598,39 @@ public class Dialogs {
         optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
         optionPane.setOptions(new Object[] {approveButton});
 
-        dialog = optionPane.createDialog(frame, "Choose scoring system");
+        dialog = optionPane.createDialog(frame, localLanguage.getString("nwswChooser"));
 
         
         approveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
                 if(((Double) treshold1Spinner.getValue()).floatValue() > ((Double) treshold2Spinner.getValue()).floatValue()){
-                    JOptionPane.showMessageDialog(null, "cant be ", "InfoBox: ", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, localLanguage.getString("nwswError1"), "", JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
+                
+                if(frame.getFirstScrollPane().getImagePanel().getDescriptors().getProjection() == null ||
+                        frame.getSecondScrollPane().getImagePanel().getDescriptors().getProjection() == null){
+                    return;
+                }
+                
+                SequenceMatchingCost cost;
+                try{
+                  cost = new SequenceMatchingCost(
+                        ((Double) gapOpeningSpinner.getValue()).floatValue(), 
+                        ((Double) gapContinueSpinner.getValue()).floatValue() , 
+                        ((Double) matchExactSpinner.getValue()).floatValue() , 
+                        ((Double) matchApproximateSpinner.getValue()).floatValue() , 
+                        ((Double) matchMissmatchSpinner.getValue()).floatValue(), 
+                        ((Double) treshold1Spinner.getValue()).floatValue(), 
+                        ((Double) treshold2Spinner.getValue()).floatValue());
+                  
+                }
+                catch(IllegalArgumentException ex){
+                    JOptionPane.showMessageDialog(null,ex.getMessage(), "", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                
                 
 
                 frame.setProjectionGlassPane();
@@ -622,17 +648,11 @@ public class Dialogs {
                 
                 frame.lockImagePanels(true);
                 
-                SequenceMatchingCost cost = new SequenceMatchingCost(
-                        ((Double) gapOpeningSpinner.getValue()).floatValue(), 
-                        ((Double) gapContinueSpinner.getValue()).floatValue() , 
-                        ((Double) matchExactSpinner.getValue()).floatValue() , 
-                        ((Double) matchApproximateSpinner.getValue()).floatValue() , 
-                        ((Double) matchMissmatchSpinner.getValue()).floatValue(), 
-                        ((Double) treshold1Spinner.getValue()).floatValue(), 
-                        ((Double) treshold2Spinner.getValue()).floatValue());
+                
                 
                 frame.setSequenceMatchingScoring(cost);
                 
+                frame.setEnabled(false);
                 if(type ==VisualisationType.SMITHWATERMAN)
                 new SmithWaterman( 
                         cost, 
